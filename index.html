@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQLite DB Visualization</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- sql.js wrapper -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <!-- mermaid.js for diagram rendering -->
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         mermaid.initialize({ 
@@ -67,7 +69,7 @@
         <header class="mb-6 flex flex-col xl:flex-row xl:items-center justify-between border-b border-slate-200 pb-4 gap-4">
             <div class="flex flex-col">
                 <h1 class="text-2xl font-bold tracking-tight text-slate-900 leading-tight">SQLite DB Visualization</h1>
-                <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap text-nowrap">
                     <span>Created by</span>
                     <div class="flex items-center gap-1">
                         <img src="https://github.com/charlotte-lau-hk.png" class="w-4 h-4 rounded-full border border-slate-200 shadow-sm" alt="Avatar">
@@ -90,7 +92,6 @@
             </div>
             
             <div class="flex flex-wrap gap-3 items-center">
-                <!-- Dropdown Loader -->
                 <div class="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
                     <div class="pl-3 pr-2 py-2 bg-slate-50 border-r border-slate-200 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Samples</div>
                     <select id="db-select" onchange="loadSelectedSample()" class="px-3 py-2 text-sm w-48 md:w-64 focus:outline-none bg-transparent">
@@ -106,10 +107,9 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Sidebar: Schema Explorer -->
             <div class="lg:col-span-3 space-y-4">
                 <div class="magi-border rounded-xl bg-white p-4 shadow-sm h-[calc(100vh-180px)] flex flex-col">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-between">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-between border-b pb-2">
                         Schema Explorer
                         <span id="table-count" class="bg-slate-100 px-2 py-0.5 rounded text-slate-800 font-mono">0</span>
                     </h2>
@@ -127,14 +127,12 @@
                 </div>
             </div>
 
-            <!-- Main Content Area with Tabs -->
             <div class="lg:col-span-9 flex flex-col gap-4">
                 <div class="flex gap-8 border-b border-slate-200 px-2">
                     <button onclick="switchTab('diagram')" id="tab-diagram-btn" class="tab-btn active py-2 text-sm uppercase tracking-widest transition-all">ER Diagram</button>
                     <button onclick="switchTab('schema')" id="tab-schema-btn" class="tab-btn py-2 text-sm uppercase tracking-widest transition-all">Relational Schema</button>
                 </div>
 
-                <!-- Tab 1: ER Diagram -->
                 <div id="pane-diagram" class="space-y-4">
                     <div class="flex items-center justify-between bg-white border border-slate-200 p-2 rounded-lg shadow-sm">
                         <div class="flex items-center gap-2 bg-slate-50 p-1.5 px-3 rounded border border-slate-100">
@@ -170,7 +168,6 @@
                     </div>
                 </div>
 
-                <!-- Tab 2: Schema Text -->
                 <div id="pane-schema" class="hidden h-full">
                     <div class="magi-border rounded-xl bg-white p-8 min-h-[700px] shadow-sm overflow-auto">
                         <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
@@ -201,7 +198,7 @@
         const fieldToggle = document.getElementById('toggle-fields');
         const tableCount = document.getElementById('table-count');
 
-        // Initial Load: Fetch Samples
+        // Fetch sample list
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch('sample-database.json');
@@ -215,7 +212,7 @@
                     });
                 }
             } catch (err) {
-                console.warn("Could not load sample-database.json. Dropdown will be empty.");
+                console.warn("Could not load sample-database.json.");
             }
         });
 
@@ -244,7 +241,7 @@
             reader.onload = () => { 
                 currentDbData = reader.result; 
                 processDatabase(currentDbData);
-                dbSelect.value = ""; // Clear dropdown if local file is uploaded
+                dbSelect.value = ""; 
             };
             reader.readAsArrayBuffer(file);
         });
@@ -252,7 +249,10 @@
         async function processDatabase(buffer) {
             loader.classList.remove('hidden');
             try {
-                const config = { locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js` };
+                // Correcting the locateFile logic
+                const config = { 
+                    locateFile: filename => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${filename}` 
+                };
                 const SQL = await initSqlJs(config);
                 const db = new SQL.Database(new Uint8Array(buffer));
                 
@@ -306,7 +306,7 @@
                     sidebarHtml += `
                         <details class="group bg-white border border-slate-200 rounded-lg overflow-hidden mb-2 shadow-sm">
                             <summary class="p-3 text-sm font-bold code-font flex justify-between items-center hover:bg-slate-50 transition-colors">
-                                <span class="truncate pr-2">${tableName}</span>
+                                <span class="truncate pr-2 text-slate-800">${tableName}</span>
                                 <i class="fas fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0"></i>
                             </summary>
                             <div class="px-3 pb-3 border-t border-slate-100 pt-2 bg-slate-50/50">
@@ -374,10 +374,26 @@
         }
 
         async function renderDiagram(code) {
+            // Ensure Diagram pane is visible for measurement calculation
+            const pane = document.getElementById('pane-diagram');
+            if(pane.classList.contains('hidden')) switchTab('diagram');
+
             diagramContainer.innerHTML = `<div class="mermaid" id="target-svg">${code}</div>`;
-            await window.mermaid.run();
-            const svg = diagramContainer.querySelector('svg');
-            if (svg) { svg.style.width = '100%'; svg.style.height = 'auto'; svg.style.maxWidth = 'none'; }
+            
+            // Critical timing fix for SVG geometry calculations
+            await new Promise(r => setTimeout(r, 60));
+
+            try {
+                await window.mermaid.run();
+                const svg = diagramContainer.querySelector('svg');
+                if (svg) { 
+                    svg.style.width = '100%'; 
+                    svg.style.height = 'auto'; 
+                    svg.style.maxWidth = 'none'; 
+                }
+            } catch (err) {
+                console.error("Rendering issue:", err);
+            }
         }
 
         function switchTab(tab) {
