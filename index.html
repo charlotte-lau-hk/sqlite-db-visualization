@@ -18,21 +18,22 @@
                 fontSize: '16px',
                 primaryColor: '#ffffff',
                 primaryTextColor: '#000000',
-                lineColor: '#0f172a', 
-                secondaryColor: '#f8fafc',
-                tertiaryColor: '#f1f5f9'
+                lineColor: '#450a0a', 
+                secondaryColor: '#fff5f5',
+                tertiaryColor: '#fef2f2'
             },
             er: {
                 useMaxWidth: false,
+                direction: 'TB',
                 layoutDirection: 'TB',
                 minEntityWidth: 160,
-                minEntityHeight: 100,
+                minEntityHeight: 80,
             }
         });
         window.mermaid = mermaid;
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;700&family=Source+Code+Pro:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;700;800&family=Source+Code+Pro:wght@400;600&display=swap');
         
         body { 
             font-family: 'Inter', sans-serif; 
@@ -42,29 +43,28 @@
             padding: 0;
         }
 
-        /* Solid header with a very tight, subtle transition */
+        /* Warmer Dark Crimson Header */
         header.main-header {
-            background-color: #0f172a;
+            background-color: #1a0505;
             position: relative;
-            z-index: 20;
+            z-index: 10;
         }
 
         .header-shadow {
-            height: 80px;
-            background: linear-gradient(to bottom, #0f172a 0%, transparent 100%);
+            height: 40px; 
+            background: linear-gradient(to bottom, #1a0505 0%, transparent 100%);
             pointer-events: none;
         }
 
         .code-font { font-family: 'Source Code Pro', 'Fira Code', monospace; }
-        .magi-border { border: 1px solid #e2e8f0; }
         
         #diagram-container svg { 
             width: 100%; 
             height: auto; 
-            min-height: 600px;
+            min-height: 500px;
             background: white; 
             padding: 40px; 
-            border-radius: 8px; 
+            border-radius: 0px; 
         }
         
         details summary { cursor: pointer; list-style: none; }
@@ -77,28 +77,52 @@
         .badge-uq { background-color: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
 
         .tab-btn { border-bottom: 3px solid transparent; }
-        .tab-btn.active { border-bottom-color: #0f172a; color: #0f172a; font-weight: 700; }
+        .tab-btn.active { border-bottom-color: #450a0a; color: #450a0a; font-weight: 800; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #0f172a; }
+        ::-webkit-scrollbar-thumb:hover { background: #450a0a; }
+
+        .mermaid-code-box {
+            background-color: #0f172a;
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* Dashboard Piece Style */
+        .unified-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            min-height: 800px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 1024px) {
+            .unified-card { flex-direction: column; }
+            .sidebar-section { width: 100% !important; border-right: none !important; border-bottom: 1px solid #e2e8f0; }
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
     <header class="main-header">
-        <div class="max-w-[1600px] mx-auto p-4 md:p-6 pb-12">
-            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pt-2">
-                <div class="flex flex-col">
-                    <h1 class="text-2xl font-bold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
-                    <div class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-2 flex-wrap text-nowrap">
-                        <span class="font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 border border-slate-700">v2026.04.02-beta3</span>
-                        <span class="opacity-50">|</span>
-                        <span>Created by</span>
-                        <div class="flex items-center gap-1">
-                            <img src="https://github.com/charlotte-lau-hk.png" class="w-4 h-4 rounded-full border border-slate-700 shadow-sm" alt="Avatar">
-                            <a href="https://github.com/charlotte-lau-hk" target="_blank" class="font-bold text-slate-200 hover:text-white hover:underline transition-colors">Charlotte Lau</a> 
+        <div class="max-w-[1600px] mx-auto p-4 md:p-6 pb-60"> <!-- Increased PB to pb-60 for absolute safety -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="flex flex-col gap-2">
+                    <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
+                    <div class="text-[11px] text-red-200/60 flex items-center gap-2 flex-wrap">
+                        <span class="font-mono bg-red-950/50 px-2 py-0.5 rounded text-red-400 border border-red-900/50">v2026.04.02-beta12</span>
+                        <span class="opacity-30">|</span>
+                        <div class="flex items-center gap-1.5">
+                            <span>Created by</span>
+                            <img src="https://github.com/charlotte-lau-hk.png" class="w-4 h-4 rounded-full border border-red-900 shadow-sm" alt="Avatar">
+                            <a href="https://github.com/charlotte-lau-hk" target="_blank" class="font-bold text-red-100 hover:text-white hover:underline transition-colors">Charlotte Lau</a> 
                         </div>
                         <span>with</span>
                         <a href="https://gemini.google.com" target="_blank" class="inline-flex items-center gap-1 text-sky-400 hover:text-sky-300 hover:underline font-medium transition-colors">
@@ -117,16 +141,15 @@
                 </div>
                 
                 <div class="flex flex-wrap gap-3 items-center">
-                    <!-- Dropdown Loader -->
-                    <div class="flex items-center bg-slate-800/40 border border-slate-700 rounded-lg overflow-hidden shadow-sm">
-                        <div class="pl-3 pr-2 py-2 bg-slate-800/60 border-r border-slate-700 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Samples</div>
-                        <select id="db-select" onchange="loadSelectedSample()" class="px-3 py-2 text-sm w-48 md:w-64 focus:outline-none bg-transparent text-slate-200 cursor-pointer appearance-none">
-                            <option value="" class="bg-slate-900 text-slate-400">Choose a database...</option>
+                    <div class="flex items-center bg-red-950/40 border border-red-900/50 rounded-lg overflow-hidden shadow-sm">
+                        <div class="pl-3 pr-2 py-2 bg-red-950/60 border-r border-red-900/50 text-[10px] font-bold text-red-400/80 uppercase tracking-widest">Samples</div>
+                        <select id="db-select" onchange="loadSelectedSample()" class="px-3 py-2 text-sm w-48 focus:outline-none bg-transparent text-red-50 cursor-pointer appearance-none">
+                            <option value="" class="bg-stone-900 text-slate-400">Choose database...</option>
                         </select>
                     </div>
 
-                    <label class="cursor-pointer bg-sky-600 text-white hover:bg-sky-500 px-5 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide">
-                        <i class="fas fa-file-upload text-xs"></i> Load Local File
+                    <label class="cursor-pointer bg-red-700 text-white hover:bg-red-600 px-5 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border border-red-500/30">
+                        <i class="fas fa-file-upload text-xs"></i> Load File
                         <input type="file" id="db-upload" class="hidden" accept=".db,.sqlite,.sqlite3">
                     </label>
                 </div>
@@ -135,17 +158,18 @@
     </header>
     <div class="header-shadow"></div>
 
-    <main class="max-w-[1600px] mx-auto p-4 md:p-6 -mt-20 relative z-30">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Sidebar: Schema Explorer -->
-            <div class="lg:col-span-3 space-y-4">
-                <div class="magi-border rounded-xl bg-white p-4 shadow-xl h-[calc(100vh-200px)] flex flex-col">
-                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-between border-b pb-2">
+    <main class="max-w-[1600px] mx-auto p-4 md:p-6 -mt-20 relative z-30"> <!-- Reduced negative margin to -mt-20 -->
+        <div class="unified-card border-t-4 border-t-red-800">
+            
+            <!-- LEFT PIECE: Schema Explorer -->
+            <div class="sidebar-section w-1/4 min-w-[300px] flex flex-col bg-slate-50/40 border-r border-slate-100">
+                <div class="p-6 flex-grow flex flex-col overflow-hidden">
+                    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-between border-b pb-4">
                         Schema Explorer
-                        <span id="table-count" class="bg-slate-100 px-2 py-0.5 rounded text-slate-800 font-mono">0</span>
+                        <span id="table-count" class="bg-slate-200 px-2 py-0.5 rounded text-slate-600 font-mono">0</span>
                     </h2>
                     
-                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 mb-4 pb-4 border-b border-slate-100">
+                    <div class="grid grid-cols-2 gap-x-2 gap-y-2 mb-6">
                         <div class="flex items-center gap-1.5"><span class="badge badge-pk">PK</span> <span class="text-[9px] text-slate-500 uppercase font-bold">Primary</span></div>
                         <div class="flex items-center gap-1.5"><span class="badge badge-fk">FK</span> <span class="text-[9px] text-slate-500 uppercase font-bold">Foreign</span></div>
                         <div class="flex items-center gap-1.5"><span class="badge badge-nn">NN</span> <span class="text-[9px] text-slate-500 uppercase font-bold">Not Null</span></div>
@@ -153,64 +177,89 @@
                     </div>
 
                     <div id="table-list" class="space-y-2 overflow-y-auto flex-grow pr-2">
-                        <p class="text-sm text-slate-400 italic text-center py-10">Select a sample or upload a file.</p>
+                        <p class="text-sm text-slate-400 italic text-center py-20 font-medium">No database loaded.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Content Area with Tabs -->
-            <div class="lg:col-span-9 flex flex-col gap-4">
-                <div class="flex gap-8 border-b border-slate-200 px-4 bg-white rounded-t-xl shadow-sm">
-                    <button onclick="switchTab('diagram')" id="tab-diagram-btn" class="tab-btn active py-4 text-sm uppercase tracking-widest transition-all">ER Diagram</button>
-                    <button onclick="switchTab('schema')" id="tab-schema-btn" class="tab-btn py-4 text-sm uppercase tracking-widest transition-all">Relational Schema</button>
-                </div>
-
-                <!-- Tab 1: ER Diagram -->
-                <div id="pane-diagram" class="space-y-4">
-                    <div class="flex flex-col sm:flex-row items-center justify-between bg-white border border-slate-200 p-2.5 rounded-lg shadow-sm gap-4">
-                        <div class="flex items-center gap-2 bg-slate-50 p-2 px-4 rounded border border-slate-100">
-                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Detailed View</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="toggle-fields" class="sr-only peer" checked>
-                                <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-slate-800"></div>
-                            </label>
-                        </div>
-                        <div id="export-controls" class="hidden flex gap-2">
-                            <button onclick="downloadPNG()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded transition text-xs font-bold flex items-center gap-2 shadow-sm">
-                                <i class="fas fa-image"></i> PNG (1600px)
-                            </button>
-                            <button onclick="downloadSVG()" class="bg-sky-600 hover:bg-sky-500 text-white px-5 py-2 rounded transition text-xs font-bold flex items-center gap-2 shadow-sm">
-                                <i class="fas fa-file-code"></i> SVG
-                            </button>
-                        </div>
+            <!-- RIGHT PIECE: Content Area -->
+            <div class="flex-grow flex flex-col bg-white">
+                <!-- Tab Header -->
+                <div class="flex items-center justify-between border-b border-slate-100 bg-white px-6">
+                    <div class="flex gap-8">
+                        <button onclick="switchTab('diagram')" id="tab-diagram-btn" class="tab-btn active py-5 text-xs font-extrabold uppercase tracking-widest transition-all">ER Diagram</button>
+                        <button onclick="switchTab('schema')" id="tab-schema-btn" class="tab-btn py-5 text-xs font-extrabold uppercase tracking-widest transition-all">Relational Schema</button>
                     </div>
-
-                    <div class="magi-border rounded-xl bg-white p-2 min-h-[700px] flex items-start justify-center overflow-auto shadow-sm relative" id="canvas">
-                        <div id="diagram-container" class="w-full h-full flex justify-center">
-                            <div class="h-full flex flex-col items-center justify-center text-slate-400 py-32">
-                                <i class="fas fa-project-diagram text-7xl mb-6 opacity-10 text-slate-300"></i>
-                                <p class="text-lg font-medium italic">Visualization will appear here...</p>
-                            </div>
-                        </div>
-                        <div id="loader" class="hidden absolute inset-0 bg-white/95 flex items-center justify-center backdrop-blur-sm z-50">
-                            <div class="flex flex-col items-center gap-4 text-slate-900">
-                                <div class="w-14 h-14 border-4 border-slate-800 border-t-transparent rounded-full animate-spin"></div>
-                                <p class="font-bold animate-pulse uppercase tracking-widest text-xs">Analyzing Schema Structure...</p>
-                            </div>
-                        </div>
+                    
+                    <div id="export-controls" class="hidden flex gap-2">
+                        <button onclick="downloadPNG()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded text-[10px] font-bold flex items-center gap-2 transition-colors">
+                            <i class="fas fa-image"></i> PNG
+                        </button>
+                        <button onclick="downloadSVG()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded text-[10px] font-bold flex items-center gap-2 transition-colors">
+                            <i class="fas fa-file-code"></i> SVG
+                        </button>
                     </div>
                 </div>
 
-                <!-- Tab 2: Schema Text -->
-                <div id="pane-schema" class="hidden h-full">
-                    <div class="magi-border rounded-xl bg-white p-8 min-h-[700px] shadow-sm overflow-auto">
-                        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">HKDSE Relational Schema Format</h3>
-                            <button onclick="copySchemaText()" id="copy-schema-btn" class="hidden bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-md text-[10px] font-bold text-slate-500 border border-slate-200 transition uppercase tracking-wide">
-                                <i class="fas fa-copy mr-2 text-slate-400"></i> Copy Schema Text
+                <div class="flex-grow flex flex-col p-6 overflow-hidden">
+                    <!-- Tab 1: Diagram Pane -->
+                    <div id="pane-diagram" class="h-full flex flex-col gap-6">
+                        <div class="flex items-center justify-between bg-slate-50 border border-slate-100 p-2 px-4 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Layout Configuration</span>
+                                <div class="h-3 w-px bg-slate-200"></div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Detailed View</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="toggle-fields" class="sr-only peer" checked>
+                                        <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-red-800"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-grow border border-slate-100 rounded-xl bg-slate-50/50 flex items-start justify-center overflow-auto relative min-h-[500px]" id="canvas">
+                            <div id="diagram-container" class="w-full h-full flex justify-center">
+                                <div class="h-full flex flex-col items-center justify-center text-slate-400 py-32">
+                                    <i class="fas fa-project-diagram text-7xl mb-6 opacity-10"></i>
+                                    <p class="text-lg font-medium italic">Awaiting Input...</p>
+                                </div>
+                            </div>
+                            <div id="loader" class="hidden absolute inset-0 bg-white/95 flex items-center justify-center backdrop-blur-sm z-50">
+                                <div class="flex flex-col items-center gap-4 text-slate-900">
+                                    <div class="w-14 h-14 border-4 border-red-800 border-t-transparent rounded-full animate-spin"></div>
+                                    <p class="font-bold animate-pulse uppercase tracking-widest text-xs">Generating Model...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="mermaid-code-container" class="hidden space-y-2 mt-4">
+                            <div class="flex items-center justify-between px-2">
+                                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <i class="fas fa-code text-red-600"></i> Mermaid Code
+                                </h3>
+                                <div class="flex gap-4 items-center">
+                                    <button onclick="openInLiveEditor()" class="text-[10px] font-bold text-sky-600 hover:text-sky-700 uppercase tracking-wide flex items-center gap-1">
+                                        <i class="fas fa-external-link-alt"></i> Live Editor
+                                    </button>
+                                    <button onclick="copyMermaidCode()" id="copy-mermaid-btn" class="text-[10px] font-bold text-slate-500 hover:text-slate-800 uppercase tracking-wide">
+                                        Copy Code
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea id="mermaid-code-display" readonly class="code-font w-full h-32 p-4 rounded-lg mermaid-code-box border border-slate-800 focus:outline-none resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Schema Pane -->
+                    <div id="pane-schema" class="hidden h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Relational Schema (DSE Format)</h3>
+                            <button onclick="copySchemaText()" id="copy-schema-btn" class="hidden bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-md text-[10px] font-bold text-slate-500 border border-slate-200 transition uppercase tracking-wide">
+                                <i class="fas fa-copy mr-2"></i> Copy Text
                             </button>
                         </div>
-                        <div id="schema-text-container" class="code-font text-sm leading-relaxed whitespace-pre text-slate-800">
+                        <div id="schema-text-container" class="code-font text-sm leading-relaxed whitespace-pre text-slate-800 flex-grow bg-slate-50/30 p-6 rounded-xl border border-slate-100">
                             <p class="text-slate-400 italic">No database analyzed yet.</p>
                         </div>
                     </div>
@@ -223,16 +272,18 @@
 
     <script>
         let currentDbData = null;
+        let lastGeneratedMermaidCode = "";
         const dbUpload = document.getElementById('db-upload');
         const dbSelect = document.getElementById('db-select');
         const tableList = document.getElementById('table-list');
         const diagramContainer = document.getElementById('diagram-container');
         const schemaTextContainer = document.getElementById('schema-text-container');
+        const mermaidCodeDisplay = document.getElementById('mermaid-code-display');
+        const mermaidCodeContainer = document.getElementById('mermaid-code-container');
         const loader = document.getElementById('loader');
         const fieldToggle = document.getElementById('toggle-fields');
         const tableCount = document.getElementById('table-count');
 
-        // Fetch sample list
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch('sample-database.json');
@@ -242,13 +293,11 @@
                         const opt = document.createElement('option');
                         opt.value = db.filename;
                         opt.textContent = db.name;
-                        opt.className = "bg-slate-900 text-slate-200";
+                        opt.className = "bg-stone-900 text-slate-200";
                         dbSelect.appendChild(opt);
                     });
                 }
-            } catch (err) {
-                console.warn("Could not load sample-database.json.");
-            }
+            } catch (err) { console.warn("Could not load samples."); }
         });
 
         async function loadSelectedSample() {
@@ -260,11 +309,7 @@
                 if (!response.ok) throw new Error('File not found');
                 currentDbData = await response.arrayBuffer();
                 processDatabase(currentDbData);
-            } catch (err) {
-                alert("Error loading sample: " + err.message);
-            } finally {
-                loader.classList.add('hidden');
-            }
+            } catch (err) { alert("Error: " + err.message); } finally { loader.classList.add('hidden'); }
         }
 
         fieldToggle.addEventListener('change', () => { if (currentDbData) processDatabase(currentDbData); });
@@ -284,22 +329,13 @@
         async function processDatabase(buffer) {
             loader.classList.remove('hidden');
             try {
-                const config = { 
-                    locateFile: filename => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${filename}` 
-                };
+                const config = { locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${f}` };
                 const SQL = await initSqlJs(config);
                 const db = new SQL.Database(new Uint8Array(buffer));
-                
                 const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-                if (tables.length === 0) {
-                    alert("No valid tables found.");
-                    loader.classList.add('hidden');
-                    return;
-                }
-
+                if (tables.length === 0) { alert("No valid tables found."); loader.classList.add('hidden'); return; }
                 const tableNames = tables[0].values.map(v => v[0]);
                 tableCount.innerText = tableNames.length;
-
                 let mermaidSyntax = "erDiagram\n";
                 let relationships = "";
                 let sidebarHtml = "";
@@ -310,20 +346,15 @@
                     const columns = db.exec(`PRAGMA table_info(${tableName})`);
                     const fks = db.exec(`PRAGMA foreign_key_list(${tableName})`);
                     const indices = db.exec(`PRAGMA index_list(${tableName})`);
-                    
                     const colData = columns[0].values;
                     const fkData = fks.length > 0 ? fks[0].values : [];
-                    
                     const pks = colData.filter(c => c[5] > 0).sort((a,b) => a[5] - b[5]).map(c => c[1]);
                     const allCols = colData.map(c => c[1]);
-                    
                     fullSchemaText += `${tableName} (${allCols.join(', ')})\n`;
                     if (pks.length > 0) fullSchemaText += `  Primary key: ${pks.join(' + ')}\n`;
                     if (fkData.length > 0) {
                         fullSchemaText += `  Foreign key:\n`;
-                        fkData.forEach(f => {
-                            fullSchemaText += `  - ${f[3]} references ${f[4]} of ${f[2]}\n`;
-                        });
+                        fkData.forEach(f => { fullSchemaText += `  - ${f[3]} references ${f[4]} of ${f[2]}\n`; });
                     }
                     fullSchemaText += `\n`;
 
@@ -339,9 +370,9 @@
 
                     sidebarHtml += `
                         <details class="group bg-white border border-slate-200 rounded-lg overflow-hidden mb-2 shadow-sm">
-                            <summary class="p-3 text-sm font-bold code-font flex justify-between items-center hover:bg-slate-50 transition-colors">
-                                <span class="truncate pr-2 text-slate-800">${tableName}</span>
-                                <i class="fas fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0"></i>
+                            <summary class="p-3 text-[13px] font-bold code-font flex justify-between items-center hover:bg-red-50 transition-colors">
+                                <span class="truncate pr-2 text-slate-800 font-bold">${tableName}</span>
+                                <i class="fas fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition-transform"></i>
                             </summary>
                             <div class="px-3 pb-3 border-t border-slate-100 pt-2 bg-slate-50/50">
                                 <table class="w-full text-[10px] code-font">
@@ -390,39 +421,30 @@
                         });
                         mermaidSyntax += `    }\n`;
                     } else mermaidSyntax += `    ${tableName}\n`;
-
-                    if (fkData.length > 0) {
-                        fkData.forEach(fk => { relationships += `    ${fk[2]} ||--o{ ${tableName} : "${fk[3]}"\n`; });
-                    }
+                    if (fkData.length > 0) { fkData.forEach(fk => { relationships += `    ${fk[2]} ||--o{ ${tableName} : "${fk[3]}"\n`; }); }
                 });
 
                 tableList.innerHTML = sidebarHtml;
                 schemaTextContainer.innerText = fullSchemaText;
-                await renderDiagram(mermaidSyntax + relationships);
+                lastGeneratedMermaidCode = mermaidSyntax + relationships;
+                mermaidCodeDisplay.value = lastGeneratedMermaidCode;
+                mermaidCodeContainer.classList.remove('hidden');
+                await renderDiagram(lastGeneratedMermaidCode);
                 document.getElementById('export-controls').classList.remove('hidden');
                 document.getElementById('copy-schema-btn').classList.remove('hidden');
-            } catch (err) {
-                console.error(err);
-                alert("Processing failed: " + err.message);
-            } finally { loader.classList.add('hidden'); }
+            } catch (err) { alert("Error: " + err.message); } finally { loader.classList.add('hidden'); }
         }
 
         async function renderDiagram(code) {
             const pane = document.getElementById('pane-diagram');
             if(pane.classList.contains('hidden')) switchTab('diagram');
             diagramContainer.innerHTML = `<div class="mermaid" id="target-svg">${code}</div>`;
-            await new Promise(r => setTimeout(r, 60));
+            await new Promise(r => setTimeout(r, 80));
             try {
                 await window.mermaid.run();
                 const svg = diagramContainer.querySelector('svg');
-                if (svg) { 
-                    svg.style.width = '100%'; 
-                    svg.style.height = 'auto'; 
-                    svg.style.maxWidth = 'none'; 
-                }
-            } catch (err) {
-                console.error("Rendering issue:", err);
-            }
+                if (svg) { svg.style.width = '100%'; svg.style.height = 'auto'; svg.style.maxWidth = 'none'; }
+            } catch (err) { console.error("Error:", err); }
         }
 
         function switchTab(tab) {
@@ -435,22 +457,31 @@
         function copySchemaText() {
             const text = schemaTextContainer.innerText;
             const temp = document.createElement('textarea');
-            temp.value = text;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
+            temp.value = text; document.body.appendChild(temp);
+            temp.select(); document.execCommand('copy');
             document.body.removeChild(temp);
             const btn = document.getElementById('copy-schema-btn');
             btn.innerHTML = '<i class="fas fa-check mr-2 text-emerald-500"></i> COPIED!';
-            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy mr-2 text-slate-400"></i> COPY SCHEMA TEXT'; }, 2000);
+            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy mr-2 text-slate-400"></i> COPY TEXT'; }, 2000);
+        }
+
+        function copyMermaidCode() {
+            mermaidCodeDisplay.select(); document.execCommand('copy');
+            const btn = document.getElementById('copy-mermaid-btn');
+            btn.innerText = 'COPIED!';
+            setTimeout(() => { btn.innerText = 'COPY CODE'; }, 2000);
+        }
+
+        function openInLiveEditor() {
+            const state = { code: lastGeneratedMermaidCode, mermaid: JSON.stringify({ theme: 'neutral' }), updateEditor: true, autoSync: true, updateDiagram: true };
+            window.open(`https://mermaid.live/edit#base64:${btoa(JSON.stringify(state))}`, '_blank');
         }
 
         function downloadSVG() {
             const svg = diagramContainer.querySelector('svg');
             if (!svg) return;
-            const svgData = new XMLSerializer().serializeToString(svg);
-            const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-            triggerDownload(URL.createObjectURL(blob), 'schema_diagram.svg');
+            const blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+            triggerDownload(URL.createObjectURL(blob), 'schema.svg');
         }
 
         function downloadPNG() {
@@ -459,30 +490,23 @@
             const canvas = document.getElementById('conversion-canvas');
             const ctx = canvas.getContext('2d');
             const img = new Image();
-            const svgData = new XMLSerializer().serializeToString(svg);
-            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(svgBlob);
+            const blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
             img.onload = function() {
-                const targetWidth = 1600;
-                const scale = targetWidth / img.width;
-                canvas.width = targetWidth;
-                canvas.height = img.height * scale;
-                ctx.fillStyle = "white";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const w = 1600; const h = img.height * (w / img.width);
+                canvas.width = w; canvas.height = h;
+                ctx.fillStyle = "white"; ctx.fillRect(0, 0, w, h);
+                ctx.drawImage(img, 0, 0, w, h);
                 URL.revokeObjectURL(url);
-                triggerDownload(canvas.toDataURL("image/png", 1.0), 'schema_diagram.png');
+                triggerDownload(canvas.toDataURL("image/png"), 'schema.png');
             };
             img.src = url;
         }
 
         function triggerDownload(url, filename) {
             const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.href = url; link.download = filename;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
