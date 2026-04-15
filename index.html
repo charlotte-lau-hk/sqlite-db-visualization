@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
     <!-- mermaid.js for diagram rendering -->
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.5/dist/mermaid.esm.min.mjs';
         mermaid.initialize({ 
             startOnLoad: false, 
             theme: 'neutral',
@@ -384,16 +384,18 @@
                                         const isUQ = uniqueCols.has(name);
                                         return `
                                         <tr>
-                                            <td class="py-1.5 pr-2">
+                                            <td class="py-1.5 pr-2 whitespace-nowrap">
+                                                <span class="${isPK || isFK ? 'font-bold text-slate-900' : 'text-slate-600'}">${name}</span>
+                                            </td>
+                                            <td class="py-1.5 pr-2 text-slate-400 uppercase italic whitespace-nowrap">${c[2]}</td>
+                                            <td class="py-1.5">
                                                 <div class="flex items-center flex-nowrap gap-1">
-                                                    <span class="${isPK || isFK ? 'font-bold text-slate-900' : 'text-slate-600'} whitespace-nowrap">${name}</span>
                                                     ${isPK ? '<span class="badge badge-pk">PK</span>' : ''}
                                                     ${isFK ? '<span class="badge badge-fk">FK</span>' : ''}
                                                     ${isNN && !isPK ? '<span class="badge badge-nn">NN</span>' : ''}
                                                     ${isUQ && !isPK ? '<span class="badge badge-uq">UQ</span>' : ''}
                                                 </div>
                                             </td>
-                                            <td class="text-slate-400 text-right uppercase italic align-top pt-1.5 whitespace-nowrap">${c[2]}</td>
                                         </tr>
                                         `;
                                     }).join('')}
@@ -414,11 +416,8 @@
                             let constraints = [];
                             if (isPK) constraints.push("PK");
                             if (isFK) constraints.push("FK");
-                            let displayType = type;
-                            if (isNN && !isPK) displayType += "_NN";
-                            if (isUQ && !isPK) displayType += "_UQ";
                             const keyStr = constraints.join(',');
-                            mermaidSyntax += `        ${displayType} ${name}${keyStr ? ' ' + keyStr : ''}\n`;
+                            mermaidSyntax += `        ${type} ${name}${keyStr ? ' ' + keyStr : ''}\n`;
                         });
                         mermaidSyntax += `    }\n`;
                     } else mermaidSyntax += `    ${tableName}\n`;
@@ -445,7 +444,14 @@
                 await window.mermaid.run();
                 const svg = diagramContainer.querySelector('svg');
                 if (svg) { svg.style.width = '100%'; svg.style.height = 'auto'; svg.style.maxWidth = 'none'; }
-            } catch (err) { console.error("Error:", err); }
+            } catch (err) {
+                console.error("Mermaid render error:", err);
+                diagramContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full py-20 gap-3 text-red-700">
+                    <i class="fas fa-exclamation-triangle text-4xl opacity-50"></i>
+                    <p class="font-bold text-sm uppercase tracking-wide">Diagram failed to render</p>
+                    <p class="text-xs text-red-500 font-mono max-w-lg text-center">${err.message ?? String(err)}</p>
+                </div>`;
+            }
         }
 
         function switchTab(tab) {
@@ -475,7 +481,7 @@
 
         function openInLiveEditor() {
             const state = { code: lastGeneratedMermaidCode, mermaid: JSON.stringify({ theme: 'neutral' }), updateEditor: true, autoSync: true, updateDiagram: true };
-            window.open(`https://mermaid.live/edit#base64:${btoa(JSON.stringify(state))}`, '_blank');
+            window.open(`https://mermaid.live/edit#base64:${btoa(unescape(encodeURIComponent(JSON.stringify(state))))}`, '_blank');
         }
 
         function downloadSVG() {

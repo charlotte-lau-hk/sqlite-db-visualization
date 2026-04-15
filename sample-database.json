@@ -6,5 +6,13 @@
   {
     "name": "Student Club DB v2",
     "filename": "db2b-student_club_v2.db"
+  },
+  {
+    "name": "Student Club DB v3",
+    "filename": "db2c-student_club_v3.db"
+  },
+  {
+    "name": "Stationery Shop DB",
+    "filename": "db3_stationery_shop.db"
   }
 ]
