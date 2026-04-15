@@ -417,7 +417,8 @@
                             let displayType = type;
                             if (isNN && !isPK) displayType += "_NN";
                             if (isUQ && !isPK) displayType += "_UQ";
-                            mermaidSyntax += `        ${displayType} ${name} ${constraints.join('_')}\n`;
+                            const keyStr = constraints.join(',');
+                            mermaidSyntax += `        ${displayType} ${name}${keyStr ? ' ' + keyStr : ''}\n`;
                         });
                         mermaidSyntax += `    }\n`;
                     } else mermaidSyntax += `    ${tableName}\n`;
