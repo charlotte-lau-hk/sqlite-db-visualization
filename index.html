@@ -224,8 +224,9 @@
         .hdr-select option { background-color: var(--opt-bg); color: #e2e8f0; }
         .btn-accent { background-color: var(--accent); color: var(--on-accent); border-color: var(--accent-border); }
         .btn-accent:hover { background-color: var(--accent-hover); }
-        .btn-outline { background-color: var(--hdr-panel-bg); color: var(--hdr-text); border-color: var(--hdr-border); }
-        .btn-outline:hover { background-color: var(--hdr-panel-bg-strong); color: #ffffff; }
+        /* secondary action: sits back until pointed at */
+        .btn-quiet { background-color: transparent; color: var(--hdr-muted); border-color: var(--hdr-border); }
+        .btn-quiet:hover { background-color: var(--hdr-panel-bg); color: var(--hdr-text); }
         .accent-text { color: var(--accent); }
         .hover-accent-soft:hover { background-color: var(--accent-soft); }
         .spinner { border-color: var(--accent-strong); border-top-color: transparent; }
@@ -327,7 +328,7 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
                     <div class="text-[11px] hdr-muted flex items-center gap-2 flex-wrap">
-                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-2</span>
+                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-3</span>
                         <span class="opacity-30">|</span>
                         <div class="flex items-center gap-1.5">
                             <span>Created by</span>
@@ -374,11 +375,11 @@
                     </div>
 
                     <button id="sqlonline-btn" onclick="openInSqlOnline()" title="Open this database in the SQLite Online editor and practise SQL"
-                        class="hidden btn-outline px-4 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
+                        class="hidden btn-accent px-5 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
                         <i class="fas fa-terminal text-xs"></i> Practice SQL
                     </button>
 
-                    <label class="cursor-pointer btn-accent px-5 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
+                    <label class="cursor-pointer btn-quiet px-4 py-2 rounded-lg shadow-sm transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
                         <i class="fas fa-file-upload text-xs"></i> Load File
                         <input type="file" id="db-upload" class="hidden" accept=".db,.sqlite,.sqlite3">
                     </label>
