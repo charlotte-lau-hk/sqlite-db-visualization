@@ -48,7 +48,9 @@ is not that exercise.
 1. Put the `.db` file in this folder.
 2. Add an object to the array in `sample-database.json`.
 3. Add a row to the table below, so the folder documents itself.
-4. Run `python3 tools/check-db.py` from the repository root before committing.
+4. Run `python3 tools/dump-schema.py` to write its SQL source to `schema/`,
+   and commit that alongside the database.
+5. Run `python3 tools/check-db.py` from the repository root before committing.
    It reads every database here and this JSON file, and reports anything that
    would misbehave in the tool: a table with no primary key, a schema with no
    foreign keys (the ER diagram would be isolated boxes), a broken or duplicated
@@ -75,7 +77,7 @@ Things to watch for:
 | Database | File | Theme | Tables | Notes |
 | --- | --- | --- | --- | --- |
 | Student Club DB v1 (2 tables) | `db2a-student_club_v1.db` | Green | Clubs, Students | One-to-many: each student joins at most one club. Starting point for normalisation. |
-| Student Club DB v2 (3 tables) | `db2b-student_club_v2.db` | Aqua | Clubs, Students, ClubReg | Many-to-many resolved with the `ClubReg` link table. |
+| Student Club DB v2 (3 tables) | `db2b-student_club_v2.db` | Aqua | Clubs, Students, ClubReg | Many-to-many resolved with the `ClubReg` link table, whose primary key is the pair `(SID, CID)`. |
 | Student Club DB v3 (4 tables) | `db2c-student_club_v3.db` | Noble | Club, ClubInfo, Student, ClubReg | Adds a school year to the registration, giving a three-column composite key. Also carries a `ClubRecord` view (the tool shows tables only). |
 | Stationery Shop DB | `db3_stationery_shop.db` | Autumn | Category, Customer, Product, Orders, Order_Item | A small sales database: customers place orders, orders contain products. |
 | Book Loan DB (4 tables) | `db4-book_loan.db` | Classic | READER, BOOK, BKCOPY, LOAN | A library: a title (`BOOK`) has physical copies (`BKCOPY`), and a loan is a copy borrowed by a reader on a date. Composite primary key on `LOAN`, 8 of the 12 loans still open. |
@@ -85,13 +87,19 @@ this README.
 
 ## How these files are built
 
-The reliable way to author one is to keep the schema as SQL text and generate
-the database from it:
+Every database here has its SQL source in [`schema/`](../schema), written by
+`tools/dump-schema.py` - the `CREATE` statements followed by the rows as
+`INSERT`s, so the file rebuilds the database exactly:
 
 ```bash
-sqlite3 db/db5-new_exercise.db < schema/db5-new_exercise.sql
+sqlite3 db/db2b-student_club_v2.db < schema/db2b-student_club_v2.sql
 python3 tools/check-db.py
 ```
+
+That text is what makes a change reviewable: a diff of the `.sql` shows which
+constraint moved, where a diff of the `.db` shows only that some bytes changed.
+Edit the SQL, rebuild, check - or edit the database and re-run
+`tools/dump-schema.py` to bring the SQL back in step.
 
 Write the `CREATE TABLE` statements by hand, with table-level `FOREIGN KEY`
 clauses. A composite foreign key must be **one** clause naming every column:

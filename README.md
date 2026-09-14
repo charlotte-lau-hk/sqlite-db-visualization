@@ -27,14 +27,17 @@ index.html                   The whole tool - no build step, no dependencies to 
 db/sample-database.json      The list of exercise databases, read by the tool (and their themes)
 db/*.db                      The exercise databases themselves
 db/README.md                 Documents that JSON file and what each database contains
+schema/*.sql                 SQL source of each database - rebuilds it exactly
 themes/*.themes              SQL Online skins, one per theme
 themes/README.md             Documents the skin format and the link SQL Online expects
 tools/check-db.py            Validates db/*.db and the JSON index before committing
+tools/dump-schema.py         Regenerates schema/*.sql from db/*.db
 ```
 
 ### Adding an exercise database
 1. Drop the `.db` file into `db/`.
-2. Add a `{ "name": ..., "filename": ... }` entry to `db/sample-database.json`.
+2. Add a `{ "name": ..., "filename": ..., "theme": ... }` entry to `db/sample-database.json`.
+3. `python3 tools/dump-schema.py && python3 tools/check-db.py`
 
 See [`db/README.md`](db/README.md) for the details.
 
