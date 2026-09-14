@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Student Club DB v1",
+    "filename": "db2a-student_club_v1.db",
+    "theme": "green"
+  },
+  {
+    "name": "Student Club DB v2",
+    "filename": "db2b-student_club_v2.db",
+    "theme": "aqua"
+  },
+  {
+    "name": "Student Club DB v3",
+    "filename": "db2c-student_club_v3.db",
+    "theme": "noble"
+  },
+  {
+    "name": "Stationery Shop DB",
+    "filename": "db3_stationery_shop.db",
+    "theme": "autumn"
+  }
+]

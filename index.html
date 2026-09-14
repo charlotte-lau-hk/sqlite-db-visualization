@@ -10,49 +10,255 @@
     <!-- mermaid.js for diagram rendering -->
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.5/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ 
-            startOnLoad: false, 
-            theme: 'neutral',
-            themeVariables: {
-                fontFamily: '"Source Code Pro", "Fira Code", monospace',
-                fontSize: '16px',
-                primaryColor: '#ffffff',
-                primaryTextColor: '#000000',
-                lineColor: '#450a0a', 
-                secondaryColor: '#fff5f5',
-                tertiaryColor: '#fef2f2'
-            },
-            er: {
-                useMaxWidth: false,
-                direction: 'TB',
-                layoutDirection: 'TB',
-                minEntityWidth: 160,
-                minEntityHeight: 80,
-            }
-        });
         window.mermaid = mermaid;
+        // buildMermaidConfig() carries the colours of the active theme. The main
+        // script is a classic script at the end of <body>, so it has already run
+        // by the time this deferred module executes.
+        mermaid.initialize(window.buildMermaidConfig ? window.buildMermaidConfig() : { startOnLoad: false, theme: 'neutral' });
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;700;800&family=Source+Code+Pro:wght@400;600&display=swap');
+
+        /* ==================== THEME TOKENS ====================
+           Every themed surface reads these variables, so a theme is defined in
+           exactly one place. The matching Mermaid colours live in the THEMES
+           object in the main script below. */
+        :root, body[data-theme="frost"] {
+            --page-bg: #f4f8fb;
+            --hdr-bg: #0b1f2a;
+            --hdr-panel-bg: rgba(8, 51, 68, 0.45);
+            --hdr-panel-bg-strong: rgba(8, 51, 68, 0.70);
+            --hdr-border: rgba(14, 116, 144, 0.50);
+            --hdr-text: #ecfeff;
+            --hdr-muted: rgba(186, 230, 253, 0.60);
+            --hdr-chip: #67e8f9;
+            --accent: #0e7490;
+            --accent-hover: #0891b2;
+            --accent-border: rgba(103, 232, 249, 0.35);
+            --accent-strong: #164e63;
+            --accent-soft: #ecfeff;
+            --on-accent: #ffffff;
+            --opt-bg: #0b1f2a;
+        }
+        body[data-theme="rosewater"] {
+            --page-bg: #f8fafc;
+            --hdr-bg: #1a0505;
+            --hdr-panel-bg: rgba(69, 10, 10, 0.45);
+            --hdr-panel-bg-strong: rgba(69, 10, 10, 0.70);
+            --hdr-border: rgba(127, 29, 29, 0.50);
+            --hdr-text: #fee2e2;
+            --hdr-muted: rgba(254, 202, 202, 0.60);
+            --hdr-chip: #f87171;
+            --accent: #b91c1c;
+            --accent-hover: #dc2626;
+            --accent-border: rgba(248, 113, 113, 0.35);
+            --accent-strong: #450a0a;
+            --accent-soft: #fef2f2;
+            --on-accent: #ffffff;
+            --opt-bg: #1c1917;
+        }
+        body[data-theme="silver"] {
+            --page-bg: #f7f7f8;
+            --hdr-bg: #1c1f24;
+            --hdr-panel-bg: rgba(63, 63, 70, 0.45);
+            --hdr-panel-bg-strong: rgba(63, 63, 70, 0.70);
+            --hdr-border: rgba(113, 113, 122, 0.50);
+            --hdr-text: #f4f4f5;
+            --hdr-muted: rgba(228, 228, 231, 0.60);
+            --hdr-chip: #d4d4d8;
+            --accent: #52525b;
+            --accent-hover: #3f3f46;
+            --accent-border: rgba(212, 212, 216, 0.35);
+            --accent-strong: #27272a;
+            --accent-soft: #f4f4f5;
+            --on-accent: #ffffff;
+            --opt-bg: #1c1f24;
+        }
+        body[data-theme="arctic"] {
+            --page-bg: #f7f9fc;
+            --hdr-bg: #1b2540;
+            --hdr-panel-bg: rgba(51, 65, 102, 0.45);
+            --hdr-panel-bg-strong: rgba(51, 65, 102, 0.70);
+            --hdr-border: rgba(148, 163, 184, 0.45);
+            --hdr-text: #fef3ec;
+            --hdr-muted: rgba(226, 232, 240, 0.60);
+            --hdr-chip: #fbbf95;
+            --accent: #e2653f;
+            --accent-hover: #c9522f;
+            --accent-border: rgba(251, 191, 149, 0.35);
+            --accent-strong: #9a3d22;
+            --accent-soft: #fff4ed;
+            --on-accent: #ffffff;
+            --opt-bg: #1b2540;
+        }
+        body[data-theme="aurora"] {
+            --page-bg: #f5f8f7;
+            --hdr-bg: #071613;
+            --hdr-panel-bg: rgba(6, 95, 70, 0.40);
+            --hdr-panel-bg-strong: rgba(6, 95, 70, 0.65);
+            --hdr-border: rgba(45, 212, 191, 0.40);
+            --hdr-text: #ecfdf5;
+            --hdr-muted: rgba(167, 243, 208, 0.60);
+            --hdr-chip: #6ee7b7;
+            --accent: #0d9488;
+            --accent-hover: #0f766e;
+            --accent-border: rgba(110, 231, 183, 0.35);
+            --accent-strong: #065f46;
+            --accent-soft: #ecfdf5;
+            --on-accent: #ffffff;
+            --opt-bg: #071613;
+        }
+
+        body[data-theme="aqua"] {
+            --page-bg: #e6f0fa;
+            --hdr-bg: #0d1d2c;
+            --hdr-panel-bg: rgba(24, 85, 118, 0.45);
+            --hdr-panel-bg-strong: rgba(24, 85, 118, 0.70);
+            --hdr-border: rgba(33, 115, 160, 0.50);
+            --hdr-text: #e6f3fa;
+            --hdr-muted: rgba(230, 243, 250, 0.60);
+            --hdr-chip: #89c5e7;
+            --accent: #2173a0;
+            --accent-hover: #2685b9;
+            --accent-border: rgba(137, 197, 231, 0.35);
+            --accent-strong: #185576;
+            --accent-soft: #f7fbff;
+            --on-accent: #ffffff;
+            --opt-bg: #0d1d2c;
+        }
+        body[data-theme="autumn"] {
+            --page-bg: #ffedd5;
+            --hdr-bg: #2a180f;
+            --hdr-panel-bg: rgba(103, 65, 5, 0.45);
+            --hdr-panel-bg-strong: rgba(103, 65, 5, 0.70);
+            --hdr-border: rgba(151, 96, 8, 0.50);
+            --hdr-text: #fdf3e2;
+            --hdr-muted: rgba(253, 243, 226, 0.60);
+            --hdr-chip: #f8c677;
+            --accent: #976008;
+            --accent-hover: #b4720a;
+            --accent-border: rgba(248, 198, 119, 0.35);
+            --accent-strong: #674105;
+            --accent-soft: #fffaf0;
+            --on-accent: #ffffff;
+            --opt-bg: #2a180f;
+        }
+        body[data-theme="classic"] {
+            --page-bg: #ede1ed;
+            --hdr-bg: #011f37;
+            --hdr-panel-bg: rgba(0, 65, 74, 0.45);
+            --hdr-panel-bg-strong: rgba(0, 65, 74, 0.70);
+            --hdr-border: rgba(0, 109, 125, 0.50);
+            --hdr-text: #e0fbff;
+            --hdr-muted: rgba(224, 251, 255, 0.60);
+            --hdr-chip: #70edff;
+            --accent: #006d7d;
+            --accent-hover: #00889c;
+            --accent-border: rgba(112, 237, 255, 0.35);
+            --accent-strong: #00414a;
+            --accent-soft: #f5eff7;
+            --on-accent: #ffffff;
+            --opt-bg: #011f37;
+        }
+        body[data-theme="green"] {
+            --page-bg: #e9f0e3;
+            --hdr-bg: #192117;
+            --hdr-panel-bg: rgba(38, 87, 41, 0.45);
+            --hdr-panel-bg-strong: rgba(38, 87, 41, 0.70);
+            --hdr-border: rgba(54, 122, 58, 0.50);
+            --hdr-text: #eaf6ea;
+            --hdr-muted: rgba(234, 246, 234, 0.60);
+            --hdr-chip: #9cd39f;
+            --accent: #367a3a;
+            --accent-hover: #3f8f44;
+            --accent-border: rgba(156, 211, 159, 0.35);
+            --accent-strong: #265729;
+            --accent-soft: #fafcf7;
+            --on-accent: #ffffff;
+            --opt-bg: #192117;
+        }
+        body[data-theme="noble"] {
+            --page-bg: #ede9fe;
+            --hdr-bg: #180f2a;
+            --hdr-panel-bg: rgba(116, 61, 139, 0.45);
+            --hdr-panel-bg-strong: rgba(116, 61, 139, 0.70);
+            --hdr-border: rgba(146, 77, 174, 0.50);
+            --hdr-text: #f2eaf6;
+            --hdr-muted: rgba(242, 234, 246, 0.60);
+            --hdr-chip: #c39cd3;
+            --accent: #924dae;
+            --accent-hover: #9f61b9;
+            --accent-border: rgba(195, 156, 211, 0.35);
+            --accent-strong: #743d8b;
+            --accent-soft: #fafaff;
+            --on-accent: #ffffff;
+            --opt-bg: #180f2a;
+        }
+        body[data-theme="sakura"] {
+            --page-bg: #ffe4e9;
+            --hdr-bg: #24141c;
+            --hdr-panel-bg: rgba(162, 0, 38, 0.45);
+            --hdr-panel-bg-strong: rgba(162, 0, 38, 0.70);
+            --hdr-border: rgba(213, 0, 50, 0.50);
+            --hdr-text: #ffe0e8;
+            --hdr-muted: rgba(255, 224, 232, 0.60);
+            --hdr-chip: #ff7092;
+            --accent: #d50032;
+            --accent-hover: #f40039;
+            --accent-border: rgba(255, 112, 146, 0.35);
+            --accent-strong: #a20026;
+            --accent-soft: #fff5f7;
+            --on-accent: #ffffff;
+            --opt-bg: #24141c;
+        }
+
+        /* Themed chrome */
+        .hdr-muted { color: var(--hdr-muted); }
+        .hdr-link { color: var(--hdr-text); }
+        .hdr-link:hover { color: #ffffff; }
+        .hdr-avatar { border-color: var(--hdr-border); }
+        .ver-chip { background-color: var(--hdr-panel-bg); color: var(--hdr-chip); border-color: var(--hdr-border); }
+        .hdr-panel { background-color: var(--hdr-panel-bg); border-color: var(--hdr-border); }
+        .hdr-panel-label { background-color: var(--hdr-panel-bg-strong); border-color: var(--hdr-border); color: var(--hdr-chip); }
+        .hdr-select { color: var(--hdr-text); }
+        .hdr-select option { background-color: var(--opt-bg); color: #e2e8f0; }
+        .btn-accent { background-color: var(--accent); color: var(--on-accent); border-color: var(--accent-border); }
+        .btn-accent:hover { background-color: var(--accent-hover); }
+        .btn-outline { background-color: var(--hdr-panel-bg); color: var(--hdr-text); border-color: var(--hdr-border); }
+        .btn-outline:hover { background-color: var(--hdr-panel-bg-strong); color: #ffffff; }
+        .accent-text { color: var(--accent); }
+        .hover-accent-soft:hover { background-color: var(--accent-soft); }
+        .spinner { border-color: var(--accent-strong); border-top-color: transparent; }
+        #toggle-fields:checked + .toggle-track { background-color: var(--accent-strong); }
+
+        /* Transient hint, used when the loaded database is a local file */
+        #hint-toast {
+            position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 100;
+            max-width: 24rem; padding: 1rem 1.25rem; border-radius: 0.75rem;
+            background-color: #0f172a; color: #cbd5e1; font-size: 12px; line-height: 1.6;
+            box-shadow: 0 20px 40px -12px rgba(0,0,0,0.45);
+            border-left: 4px solid var(--accent);
+            cursor: pointer;
+        }
+        #hint-toast b { color: #ffffff; }
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: #f8fafc; 
+            background-color: var(--page-bg); 
             color: #1e293b;
             margin: 0;
             padding: 0;
         }
 
-        /* Warmer Dark Crimson Header */
         header.main-header {
-            background-color: #1a0505;
+            background-color: var(--hdr-bg);
             position: relative;
             z-index: 10;
         }
 
         .header-shadow {
             height: 40px; 
-            background: linear-gradient(to bottom, #1a0505 0%, transparent 100%);
+            background: linear-gradient(to bottom, var(--hdr-bg) 0%, transparent 100%);
             pointer-events: none;
         }
 
@@ -77,12 +283,12 @@
         .badge-uq { background-color: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
 
         .tab-btn { border-bottom: 3px solid transparent; }
-        .tab-btn.active { border-bottom-color: #450a0a; color: #450a0a; font-weight: 800; }
+        .tab-btn.active { border-bottom-color: var(--accent-strong); color: var(--accent-strong); font-weight: 800; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #450a0a; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-strong); }
 
         .mermaid-code-box {
             background-color: #0f172a;
@@ -101,6 +307,7 @@
             flex-direction: row;
             min-height: 800px;
             border: 1px solid rgba(0,0,0,0.05);
+            border-top-color: var(--accent-strong);
         }
 
         @media (max-width: 1024px) {
@@ -109,20 +316,20 @@
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen" data-theme="frost">
 
     <header class="main-header">
         <div class="max-w-[1600px] mx-auto p-4 md:p-6 pb-60"> <!-- Increased PB to pb-60 for absolute safety -->
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div class="flex flex-col gap-2">
                     <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
-                    <div class="text-[11px] text-red-200/60 flex items-center gap-2 flex-wrap">
-                        <span class="font-mono bg-red-950/50 px-2 py-0.5 rounded text-red-400 border border-red-900/50">v2026.04.15-3</span>
+                    <div class="text-[11px] hdr-muted flex items-center gap-2 flex-wrap">
+                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-1</span>
                         <span class="opacity-30">|</span>
                         <div class="flex items-center gap-1.5">
                             <span>Created by</span>
-                            <img src="https://github.com/charlotte-lau-hk.png" class="w-4 h-4 rounded-full border border-red-900 shadow-sm" alt="Avatar">
-                            <a href="https://github.com/charlotte-lau-hk" target="_blank" class="font-bold text-red-100 hover:text-white hover:underline transition-colors">Charlotte Lau</a> 
+                            <img src="https://github.com/charlotte-lau-hk.png" class="w-4 h-4 rounded-full border hdr-avatar shadow-sm" alt="Avatar">
+                            <a href="https://github.com/charlotte-lau-hk" target="_blank" class="font-bold hdr-link hover:underline transition-colors">Charlotte Lau</a> 
                         </div>
                         <span>with</span>
                         <a href="https://gemini.google.com" target="_blank" class="inline-flex items-center gap-1 text-sky-400 hover:text-sky-300 hover:underline font-medium transition-colors">
@@ -156,14 +363,19 @@
                 </div>
                 
                 <div class="flex flex-wrap gap-3 items-center">
-                    <div class="flex items-center bg-red-950/40 border border-red-900/50 rounded-lg overflow-hidden shadow-sm">
-                        <div class="pl-3 pr-2 py-2 bg-red-950/60 border-r border-red-900/50 text-[10px] font-bold text-red-400/80 uppercase tracking-widest">Samples</div>
-                        <select id="db-select" onchange="loadSelectedSample()" class="px-3 py-2 text-sm w-48 focus:outline-none bg-transparent text-red-50 cursor-pointer appearance-none">
-                            <option value="" class="bg-stone-900 text-slate-400">Choose database...</option>
+                    <div class="flex items-center hdr-panel border rounded-lg overflow-hidden shadow-sm">
+                        <div class="pl-3 pr-2 py-2 hdr-panel-label border-r text-[10px] font-bold uppercase tracking-widest">Samples</div>
+                        <select id="db-select" onchange="loadSelectedSample()" class="hdr-select px-3 py-2 text-sm w-48 focus:outline-none bg-transparent cursor-pointer appearance-none">
+                            <option value="">Choose database...</option>
                         </select>
                     </div>
 
-                    <label class="cursor-pointer bg-red-700 text-white hover:bg-red-600 px-5 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border border-red-500/30">
+                    <button id="sqlonline-btn" onclick="openInSqlOnline()" title="Open this database in the SQLite Online editor and practise SQL"
+                        class="hidden btn-outline px-4 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
+                        <i class="fas fa-terminal text-xs"></i> Practice SQL
+                    </button>
+
+                    <label class="cursor-pointer btn-accent px-5 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
                         <i class="fas fa-file-upload text-xs"></i> Load File
                         <input type="file" id="db-upload" class="hidden" accept=".db,.sqlite,.sqlite3">
                     </label>
@@ -174,7 +386,7 @@
     <div class="header-shadow"></div>
 
     <main class="max-w-[1600px] mx-auto p-4 md:p-6 -mt-20 relative z-30"> <!-- Reduced negative margin to -mt-20 -->
-        <div class="unified-card border-t-4 border-t-red-800">
+        <div class="unified-card border-t-4">
             
             <!-- LEFT PIECE: Schema Explorer -->
             <div class="sidebar-section w-1/4 min-w-[300px] flex flex-col bg-slate-50/40 border-r border-slate-100">
@@ -227,7 +439,7 @@
                                     <span class="text-[10px] font-bold text-slate-500 uppercase">Detailed View</span>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" id="toggle-fields" class="sr-only peer" checked>
-                                        <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-red-800"></div>
+                                        <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all toggle-track"></div>
                                     </label>
                                 </div>
                             </div>
@@ -242,7 +454,7 @@
                             </div>
                             <div id="loader" class="hidden absolute inset-0 bg-white/95 flex items-center justify-center backdrop-blur-sm z-50">
                                 <div class="flex flex-col items-center gap-4 text-slate-900">
-                                    <div class="w-14 h-14 border-4 border-red-800 border-t-transparent rounded-full animate-spin"></div>
+                                    <div class="w-14 h-14 border-4 spinner rounded-full animate-spin"></div>
                                     <p class="font-bold animate-pulse uppercase tracking-widest text-xs">Generating Model...</p>
                                 </div>
                             </div>
@@ -251,7 +463,7 @@
                         <div id="mermaid-code-container" class="hidden space-y-2 mt-4">
                             <div class="flex items-center justify-between px-2">
                                 <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                    <i class="fas fa-code text-red-600"></i> Mermaid Code
+                                    <i class="fas fa-code accent-text"></i> Mermaid Code
                                 </h3>
                                 <div class="flex gap-4 items-center">
                                     <button onclick="openInLiveEditor()" class="text-[10px] font-bold text-sky-600 hover:text-sky-700 uppercase tracking-wide flex items-center gap-1">
@@ -283,11 +495,16 @@
         </div>
     </main>
 
+    <div id="hint-toast" class="hidden"></div>
+
     <canvas id="conversion-canvas" class="hidden"></canvas>
 
     <script>
         let currentDbData = null;
         let lastGeneratedMermaidCode = "";
+        let currentSampleFile = null;   // file name inside db/, or null for an uploaded file
+        let currentDbLabel = "database";
+        let currentTableNames = [];
         const dbUpload = document.getElementById('db-upload');
         const dbSelect = document.getElementById('db-select');
         const tableList = document.getElementById('table-list');
@@ -299,20 +516,86 @@
         const fieldToggle = document.getElementById('toggle-fields');
         const tableCount = document.getElementById('table-count');
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch('sample-database.json');
-                if (response.ok) {
-                    const samples = await response.json();
-                    samples.forEach(db => {
-                        const opt = document.createElement('option');
-                        opt.value = db.filename;
-                        opt.textContent = db.name;
-                        opt.className = "bg-stone-900 text-slate-200";
-                        dbSelect.appendChild(opt);
-                    });
+        /* ==================== THEMES ====================
+           The palette itself lives in CSS custom properties (see <style>);
+           only the Mermaid colours, which are set in JavaScript, are listed here. */
+        const THEMES = {
+            frost:     { label: 'Frost',              line: '#164e63', secondary: '#ecfeff', tertiary: '#f0fdfa' },
+            rosewater: { label: 'Rosewater Elegance', line: '#450a0a', secondary: '#fff5f5', tertiary: '#fef2f2' },
+            silver:    { label: 'Silver',             line: '#3f3f46', secondary: '#fafafa', tertiary: '#f4f4f5' },
+            arctic:    { label: 'Arctic Dawn',        line: '#9a3d22', secondary: '#fff7f2', tertiary: '#eef4fb' },
+            aurora:    { label: 'Aurora',             line: '#065f46', secondary: '#f0fdf4', tertiary: '#f5f3ff' },
+    aqua:      { label: 'Aqua',                line: '#185576', secondary: '#f7fbff', tertiary: '#f2f7fc' },
+    autumn:    { label: 'Autumn',              line: '#674105', secondary: '#fffaf0', tertiary: '#fff8f0' },
+    classic:   { label: 'Classic',             line: '#00414a', secondary: '#f5eff7', tertiary: '#f9f5f9' },
+    green:     { label: 'Green',               line: '#265729', secondary: '#fafcf7', tertiary: '#f7faf5' },
+    noble:     { label: 'Noble',               line: '#743d8b', secondary: '#fafaff', tertiary: '#f3f0fe' },
+    sakura:    { label: 'Sakura',              line: '#a20026', secondary: '#fff5f7', tertiary: '#fff0f3' }
+        };
+        const DEFAULT_THEME = 'frost';
+        let currentTheme = DEFAULT_THEME;
+
+        window.buildMermaidConfig = function () {
+            const t = THEMES[currentTheme] || THEMES[DEFAULT_THEME];
+            return {
+                startOnLoad: false,
+                theme: 'neutral',
+                themeVariables: {
+                    fontFamily: '"Source Code Pro", "Fira Code", monospace',
+                    fontSize: '16px',
+                    primaryColor: '#ffffff',
+                    primaryTextColor: '#000000',
+                    lineColor: t.line,
+                    secondaryColor: t.secondary,
+                    tertiaryColor: t.tertiary
+                },
+                er: {
+                    useMaxWidth: false,
+                    direction: 'TB',
+                    layoutDirection: 'TB',
+                    minEntityWidth: 160,
+                    minEntityHeight: 80,
                 }
-            } catch (err) { console.warn("Could not load samples."); }
+            };
+        };
+
+        // The theme is not something the student picks: it comes from the "theme"
+        // key of the chosen database in db/sample-database.json, so the colour on
+        // screen always says which exercise is open.
+        function applyTheme(name, rerender) {
+            currentTheme = THEMES[name] ? name : DEFAULT_THEME;
+            document.body.dataset.theme = currentTheme;
+            if (window.mermaid) window.mermaid.initialize(window.buildMermaidConfig());
+            if (rerender && lastGeneratedMermaidCode) renderDiagram(lastGeneratedMermaidCode);
+        }
+
+        /* ==================== SAMPLE DATABASE INDEX ====================
+           db/sample-database.json lists the exercise databases; the format is
+           documented in db/README.md. */
+        const DB_DIR = 'db/';
+        const SAMPLE_INDEX = DB_DIR + 'sample-database.json';
+        let sampleIndex = [];           // the parsed list, kept for the per-database theme
+
+        async function loadSampleIndex() {
+            let samples = [];
+            try {
+                const res = await fetch(SAMPLE_INDEX, { cache: 'no-cache' });
+                if (res.ok) samples = await res.json();
+                else console.warn('Could not read ' + SAMPLE_INDEX + ': HTTP ' + res.status);
+            } catch (err) { console.warn('Could not read ' + SAMPLE_INDEX, err); }
+
+            sampleIndex = samples.filter(db => db && db.filename);
+            sampleIndex.forEach(db => {
+                const opt = document.createElement('option');
+                opt.value = db.filename;
+                opt.textContent = db.name || db.filename;
+                dbSelect.appendChild(opt);
+            });
+            if (samples.length === 0) console.warn('No sample databases listed in ' + SAMPLE_INDEX + '.');
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadSampleIndex();
         });
 
         async function loadSelectedSample() {
@@ -320,11 +603,88 @@
             if (!filename) return;
             loader.classList.remove('hidden');
             try {
-                const response = await fetch(filename);
+                const response = await fetch(DB_DIR + filename);
                 if (!response.ok) throw new Error('File not found');
                 currentDbData = await response.arrayBuffer();
+                currentSampleFile = filename;
+                currentDbLabel = dbSelect.options[dbSelect.selectedIndex].textContent;
+                const entry = sampleIndex.find(db => db.filename === filename);
+                applyTheme(entry && entry.theme ? entry.theme : DEFAULT_THEME, false);
                 processDatabase(currentDbData);
             } catch (err) { alert("Error: " + err.message); } finally { loader.classList.add('hidden'); }
+        }
+
+        /* ==================== SQL ONLINE HAND-OFF ====================
+           sqliteonline.com reads directives out of its own hash:
+             #sqltext=<encoded>   editor contents; a "#url-sqlite=<url>" line
+                                  inside it makes the editor download that
+                                  database and open it as a connection
+             #urlcolor=<url>      a .themes file (JSON of CSS variables) that
+                                  re-skins the editor
+             #clrcolor            resets the skin to the site default
+           Both need a URL sqliteonline can reach over http(s), so neither works
+           from file:// or a local server. The directives are split on "#", and
+           sqliteonline URL-decodes the whole hash when it starts with #urlcolor
+           or #urldb - so #sqltext must come first and the skin URL must be
+           passed raw, or the encoded payload would be torn apart. */
+        const SQL_ONLINE_URL = 'https://sqliteonline.com/';
+        const SKIN_DIR = 'themes/';
+
+        function publicUrl(path) {
+            const host = location.hostname;
+            const reachable = (location.protocol === 'http:' || location.protocol === 'https:') &&
+                              host && host !== 'localhost' && host !== '127.0.0.1';
+            if (!reachable) return null;                                 // file:// or a local server
+            try { return new URL(path, location.href).href; } catch (err) { return null; }
+        }
+
+        function publicSampleUrl() {
+            if (!currentSampleFile) return null;                         // uploaded from the student's disk
+            return publicUrl(DB_DIR + currentSampleFile);
+        }
+
+        function skinUrl() {
+            return publicUrl(SKIN_DIR + currentTheme + '.themes');       // matches the theme picker
+        }
+
+        function starterSql() {
+            const lines = ['-- ' + currentDbLabel, '-- Tables: ' + (currentTableNames.join(', ') || '(none)'), ''];
+            if (currentTableNames.length > 0) lines.push('SELECT * FROM "' + currentTableNames[0] + '";');
+            return lines.join('\r\n');
+        }
+
+        function openInSqlOnline() {
+            if (!currentDbData) return;
+            const url = publicSampleUrl();
+            const skin = skinUrl();
+            if (url) {
+                const tab = (currentDbLabel.replace(/[^A-Za-z0-9 _-]/g, '').trim() || 'Practice').slice(0, 40);
+                const payload = ['#url-sqlite=' + url, '#tab-name=' + tab, starterSql()].join('\r\n');
+                let link = SQL_ONLINE_URL + '#sqltext=' + encodeURIComponent(payload);
+                if (skin) link += '#urlcolor=' + skin;                   // raw on purpose, see above
+                window.open(link, '_blank', 'noopener');
+            } else {
+                window.open(skin ? SQL_ONLINE_URL + '#urlcolor=' + skin : SQL_ONLINE_URL, '_blank', 'noopener');
+                showHint('<b>SQL Online opened in a new tab.</b><br>This database cannot be sent through a link, because ' +
+                         'SQL Online has no address to download it from. In SQL Online, click <b>Import</b> and choose <b>' +
+                         escapeHtml(currentSampleFile || currentDbLabel) + '</b> from your computer.');
+            }
+        }
+
+        let hintTimer = null;
+        function showHint(html) {
+            const el = document.getElementById('hint-toast');
+            el.innerHTML = html;
+            el.classList.remove('hidden');
+            el.onclick = () => el.classList.add('hidden');
+            clearTimeout(hintTimer);
+            hintTimer = setTimeout(() => el.classList.add('hidden'), 15000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         fieldToggle.addEventListener('change', () => { if (currentDbData) processDatabase(currentDbData); });
@@ -335,6 +695,9 @@
             const reader = new FileReader();
             reader.onload = () => { 
                 currentDbData = reader.result; 
+                currentSampleFile = null;
+                currentDbLabel = file.name;
+                applyTheme(DEFAULT_THEME, false);                         // not one of the exercises
                 processDatabase(currentDbData);
                 dbSelect.value = ""; 
             };
@@ -350,6 +713,7 @@
                 const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
                 if (tables.length === 0) { alert("No valid tables found."); loader.classList.add('hidden'); return; }
                 const tableNames = tables[0].values.map(v => v[0]);
+                currentTableNames = tableNames;
                 tableCount.innerText = tableNames.length;
                 let mermaidSyntax = "erDiagram\n";
                 let relationships = "";
@@ -385,7 +749,7 @@
 
                     sidebarHtml += `
                         <details class="group bg-white border border-slate-200 rounded-lg overflow-hidden mb-2 shadow-sm">
-                            <summary class="p-3 text-[13px] font-bold code-font flex justify-between items-center hover:bg-red-50 transition-colors">
+                            <summary class="p-3 text-[13px] font-bold code-font flex justify-between items-center hover-accent-soft transition-colors">
                                 <span class="truncate pr-2 text-slate-800 font-bold">${tableName}</span>
                                 <i class="fas fa-chevron-down text-[10px] text-slate-400 group-open:rotate-180 transition-transform"></i>
                             </summary>
@@ -447,6 +811,7 @@
                 await renderDiagram(lastGeneratedMermaidCode);
                 document.getElementById('export-controls').classList.remove('hidden');
                 document.getElementById('copy-schema-btn').classList.remove('hidden');
+                document.getElementById('sqlonline-btn').classList.remove('hidden');
             } catch (err) { alert("Error: " + err.message); } finally { loader.classList.add('hidden'); }
         }
 
@@ -456,6 +821,7 @@
             diagramContainer.innerHTML = `<div class="mermaid" id="target-svg">${code}</div>`;
             await new Promise(r => setTimeout(r, 80));
             try {
+                window.mermaid.initialize(window.buildMermaidConfig());
                 await window.mermaid.run();
                 const svg = diagramContainer.querySelector('svg');
                 if (svg) { svg.style.width = '100%'; svg.style.height = 'auto'; svg.style.maxWidth = 'none'; }
