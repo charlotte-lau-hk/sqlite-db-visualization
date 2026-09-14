@@ -1,16 +1,16 @@
 [
   {
-    "name": "Student Club DB v1",
+    "name": "Student Club DB v1 (2 tables)",
     "filename": "db2a-student_club_v1.db",
     "theme": "green"
   },
   {
-    "name": "Student Club DB v2",
+    "name": "Student Club DB v2 (3 tables)",
     "filename": "db2b-student_club_v2.db",
     "theme": "aqua"
   },
   {
-    "name": "Student Club DB v3",
+    "name": "Student Club DB v3 (4 tables)",
     "filename": "db2c-student_club_v3.db",
     "theme": "noble"
   },
