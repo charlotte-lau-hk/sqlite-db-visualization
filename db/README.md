@@ -112,8 +112,8 @@ Things to watch for:
 | Student Club DB v1 (2 tables) | `dbviz-01-student-club-v1.db` | Green | Clubs, Students | One-to-many: each student joins at most one club. Starting point for normalisation. |
 | Student Club DB v2 (3 tables) | `dbviz-02-student-club-v2.db` | Aqua | Clubs, Students, ClubReg | Many-to-many resolved with the `ClubReg` link table, whose primary key is the pair `(SID, CID)`. |
 | Student Club DB v3 (4 tables) | `dbviz-03-student-club-v3.db` | Noble | Club, ClubInfo, Student, ClubReg | Adds a school year to the registration, giving a three-column composite key. Also carries a `ClubRecord` view (the tool shows tables only). |
-| Stationery Shop DB | `dbviz-04-stationery-shop.db` | Autumn | Category, Customer, Product, Orders, Order_Item | A small sales database: customers place orders, orders contain products. |
 | Book Loan DB (4 tables) | `dbviz-05-book-loan.db` | Classic | READER, BOOK, BKCOPY, LOAN | A library: a title (`BOOK`) has physical copies (`BKCOPY`), and a loan is a copy borrowed by a reader on a date. Composite primary key on `LOAN`, 8 of the 12 loans still open. |
+| Stationery Shop DB (5 tables) | `dbviz-04-stationery-shop.db` | Autumn | Category, Customer, Product, Orders, Order_Item | A small sales database: customers place orders, orders contain products. |
 | Lunch Delivery DB (4 tables) | `dbviz-06-lunch-delivery.db` | Sakura | MainDish, Drink, Member, LunchOrder | A lunch order joins a member, a main dish and (optionally) a drink. `LunchOrder` is keyed on `(member_id, orderTime)`; one order has no drink, one member never orders and one dish is never ordered, so outer joins have something to find. |
 
 This table is documentation only — the tool reads `database-list.json`, not
