@@ -32,9 +32,9 @@ CREATE TABLE Student (
   Phone CHAR,
   PRIMARY KEY (SID)
 );
-INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('1021', 'Alice', '61231236');
-INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('0223', 'Kathy', '93030123');
-INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('0324', 'Emily', '53698741');
+INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('1021', 'Alice', '6123123');
+INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('0223', 'Kathy', '9303012');
+INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('0324', 'Emily', '5369874');
 
 CREATE TABLE ClubInfo (
   CID CHAR NOT NULL,

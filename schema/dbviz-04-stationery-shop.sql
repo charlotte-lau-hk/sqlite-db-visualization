@@ -22,16 +22,16 @@ INSERT INTO "Category" ("Category_ID", "Category_Name") VALUES (2, 'Writing Inst
 INSERT INTO "Category" ("Category_ID", "Category_Name") VALUES (3, 'Art Supplies');
 
 CREATE TABLE Customer (Customer_ID CHAR (4) NOT NULL PRIMARY KEY ON CONFLICT FAIL, First_Name CHAR (40), Last_Name CHAR (20) NOT NULL ON CONFLICT ROLLBACK, Email CHAR (50) NOT NULL ON CONFLICT ROLLBACK, Phone_Number CHAR (15) NOT NULL ON CONFLICT ROLLBACK, Address CHAR (200) NOT NULL ON CONFLICT ROLLBACK);
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('0001', 'John', 'Doe', 'john.doe@example.com', '34567890', '123 Main St, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('0002', 'Jane', 'Smith', 'jane.smith@example.com', '98765432', '456 Oak Ave, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('0003', 'Emily', 'Brown', 'emily.brown@example.com', '55555555', '789 Pine St, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('1004', 'David', 'Lee', 'david.lee@example.com', '11111111', '101 Maple Dr, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('1005', 'Olivia', 'Taylor', 'olivia.taylor@example.com', '22222222', '202 Birch Ln, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2106', 'Noah', 'Carter', 'noah.carter@example.com', '33333333', '303 Cedar Rd, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2207', 'Emma', 'Johnson', 'emma.johnson@example.com', '44444444', '404 Chestnut Ct, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2418', 'Liam', 'Williams', 'liam.williams@example.com', '55555555', '505 Cypress Ave, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2519', 'Ava', 'Jones', 'ava.jones@example.com', '66666666', '606 Douglas Blvd, City');
-INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2610', 'Sophia', 'Miller', 'sophia.miller@example.com', '77777777', '707 Elm St, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('0001', 'John', 'Doe', 'john.doe@example.com', '3456789', '123 Main St, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('0002', 'Jane', 'Smith', 'jane.smith@example.com', '9876543', '456 Oak Ave, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('0003', 'Emily', 'Brown', 'emily.brown@example.com', '5555555', '789 Pine St, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('1004', 'David', 'Lee', 'david.lee@example.com', '1111111', '101 Maple Dr, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('1005', 'Olivia', 'Taylor', 'olivia.taylor@example.com', '2222222', '202 Birch Ln, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2106', 'Noah', 'Carter', 'noah.carter@example.com', '3333333', '303 Cedar Rd, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2207', 'Emma', 'Johnson', 'emma.johnson@example.com', '4444444', '404 Chestnut Ct, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2418', 'Liam', 'Williams', 'liam.williams@example.com', '5555555', '505 Cypress Ave, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2519', 'Ava', 'Jones', 'ava.jones@example.com', '6666666', '606 Douglas Blvd, City');
+INSERT INTO "Customer" ("Customer_ID", "First_Name", "Last_Name", "Email", "Phone_Number", "Address") VALUES ('2610', 'Sophia', 'Miller', 'sophia.miller@example.com', '7777777', '707 Elm St, City');
 
 CREATE TABLE Orders (Order_ID CHAR (8) NOT NULL PRIMARY KEY ON CONFLICT FAIL, Customer_ID CHAR (4) REFERENCES Customer (Customer_ID) ON DELETE RESTRICT ON UPDATE RESTRICT MATCH "FULL", Order_Date DATE NOT NULL ON CONFLICT ROLLBACK, Total_Amount REAL DEFAULT 0, Status CHAR (10));
 INSERT INTO "Orders" ("Order_ID", "Customer_ID", "Order_Date", "Total_Amount", "Status") VALUES ('20231001-001', '2106', '2023-10-01', 10.0, 'Shipped');
