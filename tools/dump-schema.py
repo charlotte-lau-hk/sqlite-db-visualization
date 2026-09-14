@@ -10,7 +10,7 @@ Each database gets schema/<name>.sql holding its complete SQL text - the
 CREATE statements followed by the rows as INSERTs - so the database can be
 rebuilt from it exactly:
 
-    sqlite3 db/db4-book_loan.db < schema/db4-book_loan.sql
+    sqlite3 db/dbviz-05-book-loan.db < schema/dbviz-05-book-loan.sql
 
 Keeping that file in git is what makes a schema change reviewable: a diff of
 the .sql shows which constraint moved, where a diff of the .db shows nothing

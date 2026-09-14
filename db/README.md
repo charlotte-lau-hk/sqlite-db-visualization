@@ -13,12 +13,12 @@ it. It is a JSON array of objects:
 [
   {
     "name": "Student Club DB v1",
-    "filename": "db2a-student_club_v1.db",
+    "filename": "dbviz-01-student-club-v1.db",
     "theme": "green"
   },
   {
     "name": "Stationery Shop DB",
-    "filename": "db3_stationery_shop.db",
+    "filename": "dbviz-04-stationery-shop.db",
     "theme": "autumn"
   }
 ]
@@ -42,6 +42,26 @@ Leave the key out (or give an unknown value) and that database opens in `frost`,
 the default. A database the student loads from their own disk with **Load File**
 also falls back to `frost`, so an exercise colour never lingers on something that
 is not that exercise.
+
+## File naming
+
+```
+dbviz-NN-topic[-vN].db
+```
+
+- `dbviz-` marks the file as belonging to this repository, so these never get
+  confused with teaching databases from elsewhere that happen to be called
+  `db1-...`, `db2-...` and so on.
+- `NN` is a two-digit id in teaching order, **assigned once and never reused**.
+  Retiring a database leaves its gap; a new one takes the next free number.
+  Renaming a published file breaks any link that already points at it.
+- `topic` is lowercase words separated by hyphens - never underscores or
+  spaces, because the name travels inside the URL of the *Practice SQL* link.
+- `-vN` appears only where a database is a deliberate revision of another, as
+  the three Student Club versions are.
+
+The matching SQL source in `schema/` carries the same stem. Students never see
+any of this: the `name` in `sample-database.json` is the only label they read.
 
 ## Adding an exercise database
 
@@ -76,11 +96,11 @@ Things to watch for:
 
 | Database | File | Theme | Tables | Notes |
 | --- | --- | --- | --- | --- |
-| Student Club DB v1 (2 tables) | `db2a-student_club_v1.db` | Green | Clubs, Students | One-to-many: each student joins at most one club. Starting point for normalisation. |
-| Student Club DB v2 (3 tables) | `db2b-student_club_v2.db` | Aqua | Clubs, Students, ClubReg | Many-to-many resolved with the `ClubReg` link table, whose primary key is the pair `(SID, CID)`. |
-| Student Club DB v3 (4 tables) | `db2c-student_club_v3.db` | Noble | Club, ClubInfo, Student, ClubReg | Adds a school year to the registration, giving a three-column composite key. Also carries a `ClubRecord` view (the tool shows tables only). |
-| Stationery Shop DB | `db3_stationery_shop.db` | Autumn | Category, Customer, Product, Orders, Order_Item | A small sales database: customers place orders, orders contain products. |
-| Book Loan DB (4 tables) | `db4-book_loan.db` | Classic | READER, BOOK, BKCOPY, LOAN | A library: a title (`BOOK`) has physical copies (`BKCOPY`), and a loan is a copy borrowed by a reader on a date. Composite primary key on `LOAN`, 8 of the 12 loans still open. |
+| Student Club DB v1 (2 tables) | `dbviz-01-student-club-v1.db` | Green | Clubs, Students | One-to-many: each student joins at most one club. Starting point for normalisation. |
+| Student Club DB v2 (3 tables) | `dbviz-02-student-club-v2.db` | Aqua | Clubs, Students, ClubReg | Many-to-many resolved with the `ClubReg` link table, whose primary key is the pair `(SID, CID)`. |
+| Student Club DB v3 (4 tables) | `dbviz-03-student-club-v3.db` | Noble | Club, ClubInfo, Student, ClubReg | Adds a school year to the registration, giving a three-column composite key. Also carries a `ClubRecord` view (the tool shows tables only). |
+| Stationery Shop DB | `dbviz-04-stationery-shop.db` | Autumn | Category, Customer, Product, Orders, Order_Item | A small sales database: customers place orders, orders contain products. |
+| Book Loan DB (4 tables) | `dbviz-05-book-loan.db` | Classic | READER, BOOK, BKCOPY, LOAN | A library: a title (`BOOK`) has physical copies (`BKCOPY`), and a loan is a copy borrowed by a reader on a date. Composite primary key on `LOAN`, 8 of the 12 loans still open. |
 
 This table is documentation only — the tool reads `sample-database.json`, not
 this README.
@@ -92,7 +112,7 @@ Every database here has its SQL source in [`schema/`](../schema), written by
 `INSERT`s, so the file rebuilds the database exactly:
 
 ```bash
-sqlite3 db/db2b-student_club_v2.db < schema/db2b-student_club_v2.sql
+sqlite3 db/dbviz-02-student-club-v2.db < schema/dbviz-02-student-club-v2.sql
 python3 tools/check-db.py
 ```
 

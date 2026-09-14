@@ -1,27 +1,27 @@
 [
   {
     "name": "Student Club DB v1 (2 tables)",
-    "filename": "db2a-student_club_v1.db",
+    "filename": "dbviz-01-student-club-v1.db",
     "theme": "green"
   },
   {
     "name": "Student Club DB v2 (3 tables)",
-    "filename": "db2b-student_club_v2.db",
+    "filename": "dbviz-02-student-club-v2.db",
     "theme": "aqua"
   },
   {
     "name": "Student Club DB v3 (4 tables)",
-    "filename": "db2c-student_club_v3.db",
+    "filename": "dbviz-03-student-club-v3.db",
     "theme": "noble"
   },
   {
     "name": "Stationery Shop DB",
-    "filename": "db3_stationery_shop.db",
+    "filename": "dbviz-04-stationery-shop.db",
     "theme": "autumn"
   },
   {
     "name": "Book Loan DB (4 tables)",
-    "filename": "db4-book_loan.db",
+    "filename": "dbviz-05-book-loan.db",
     "theme": "classic"
   }
 ]
