@@ -230,7 +230,7 @@
         .accent-text { color: var(--accent); }
         .hover-accent-soft:hover { background-color: var(--accent-soft); }
         .spinner { border-color: var(--accent-strong); border-top-color: transparent; }
-        #toggle-fields:checked + .toggle-track { background-color: var(--accent-strong); }
+        input.peer:checked + .toggle-track { background-color: var(--accent-strong); }
 
         /* Transient hint, used when the loaded database is a local file */
         #hint-toast {
@@ -328,7 +328,7 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
                     <div class="text-[11px] hdr-muted flex items-center gap-2 flex-wrap">
-                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-4</span>
+                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-5</span>
                         <span class="opacity-30">|</span>
                         <div class="flex items-center gap-1.5">
                             <span>Created by</span>
@@ -394,6 +394,12 @@
             
             <!-- LEFT PIECE: Schema Explorer -->
             <div class="sidebar-section w-1/4 min-w-[300px] flex flex-col bg-slate-50/40 border-r border-slate-100">
+                <div id="db-info" class="hidden px-6 pt-6 pb-5 border-b border-slate-200/70 bg-white/60">
+                    <div id="db-info-name" class="text-lg font-extrabold leading-snug accent-text"></div>
+                    <div id="db-info-file" class="code-font text-[10px] text-slate-400 mt-1 break-all"></div>
+                    <p id="db-info-desc" class="text-[11px] leading-relaxed text-slate-600 mt-3"></p>
+                </div>
+
                 <div class="p-6 flex-grow flex flex-col overflow-hidden">
                     <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-between border-b pb-4">
                         Schema Explorer
@@ -499,7 +505,17 @@
                     <!-- Tab 3: SQL Schema Pane -->
                     <div id="pane-sql" class="hidden h-full flex flex-col">
                         <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">SQL Schema (CREATE statements)</h3>
+                            <div class="flex items-center gap-3">
+                                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">SQL Schema</h3>
+                                <div class="h-3 w-px bg-slate-200"></div>
+                                <div class="flex items-center gap-2" title="Tidied to the constraints the syllabus covers, or exactly as the file declares them">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase">Simplified</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="toggle-sql-simple" class="sr-only peer" checked>
+                                        <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all toggle-track"></div>
+                                    </label>
+                                </div>
+                            </div>
                             <div class="flex items-center gap-5">
                                 <a id="full-sql-link" href="#" target="_blank" rel="noopener"
                                    title="The complete SQL source of this database, rows included"
@@ -534,6 +550,9 @@
         const diagramContainer = document.getElementById('diagram-container');
         const schemaTextContainer = document.getElementById('schema-text-container');
         const sqlSchemaDisplay = document.getElementById('sql-schema-display');
+        const sqlSimpleToggle = document.getElementById('toggle-sql-simple');
+        let sqlSimpleText = "";
+        let sqlOriginalText = "";
         const mermaidCodeDisplay = document.getElementById('mermaid-code-display');
         const mermaidCodeContainer = document.getElementById('mermaid-code-container');
         const loader = document.getElementById('loader');
@@ -620,9 +639,17 @@
                 console.warn('No sample databases listed in ' + SAMPLE_INDEX + '.');
                 return;
             }
-            // Start on one of the exercises, picked at random, so the tool opens
-            // with something to look at instead of an empty canvas.
-            dbSelect.value = sampleIndex[Math.floor(Math.random() * sampleIndex.length)].filename;
+            // ?db=<file name> opens one particular exercise - the link to hand a
+            // class. Anything else (or nothing) opens one at random, so the tool
+            // never starts on an empty canvas.
+            const asked = new URLSearchParams(location.search).get('db');
+            let wanted = null;
+            if (asked) {
+                const key = asked.trim().toLowerCase().replace(/\.(db|sqlite|sqlite3)$/, '');
+                wanted = sampleIndex.find(db => db.filename.toLowerCase().replace(/\.[^.]+$/, '') === key);
+                if (!wanted) console.warn('No database named "' + asked + '" in ' + SAMPLE_INDEX + '.');
+            }
+            dbSelect.value = (wanted || sampleIndex[Math.floor(Math.random() * sampleIndex.length)]).filename;
             await loadSelectedSample();
         }
 
@@ -642,6 +669,10 @@
                 currentDbLabel = dbSelect.options[dbSelect.selectedIndex].textContent;
                 const entry = sampleIndex.find(db => db.filename === filename);
                 applyTheme(entry && entry.theme ? entry.theme : DEFAULT_THEME, false);
+                showDbInfo(entry ? entry.name : filename, filename, entry ? entry.description : '');
+                try {                                                    // the URL now links to what is on screen
+                    history.replaceState(null, '', location.pathname + '?db=' + encodeURIComponent(filename));
+                } catch (err) { /* file:// has no history to rewrite */ }
                 processDatabase(currentDbData);
             } catch (err) { alert("Error: " + err.message); } finally { loader.classList.add('hidden'); }
         }
@@ -703,6 +734,15 @@
             }
         }
 
+        function showDbInfo(name, filename, description) {
+            document.getElementById('db-info-name').textContent = name;
+            document.getElementById('db-info-file').textContent = filename;
+            const desc = document.getElementById('db-info-desc');
+            desc.textContent = description || '';
+            desc.classList.toggle('hidden', !description);
+            document.getElementById('db-info').classList.remove('hidden');
+        }
+
         let hintTimer = null;
         function showHint(html) {
             const el = document.getElementById('hint-toast');
@@ -720,6 +760,10 @@
         }
 
         fieldToggle.addEventListener('change', () => { if (currentDbData) processDatabase(currentDbData); });
+
+        sqlSimpleToggle.addEventListener('change', () => {
+            sqlSchemaDisplay.value = sqlSimpleToggle.checked ? sqlSimpleText : sqlOriginalText;
+        });
         
         dbUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -730,6 +774,10 @@
                 currentSampleFile = null;
                 currentDbLabel = file.name;
                 applyTheme(DEFAULT_THEME, false);                         // not one of the exercises
+                showDbInfo(file.name, file.name, 'Loaded from your own computer, so it is not one of the exercises.');
+                try {
+                    history.replaceState(null, '', location.pathname);
+                } catch (err) { /* file:// has no history to rewrite */ }
                 processDatabase(currentDbData);
                 dbSelect.value = ""; 
             };
@@ -749,9 +797,10 @@
                 const ddl = db.exec(`SELECT sql FROM sqlite_master
                                      WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%'
                                      ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END, name`);
-                sqlSchemaDisplay.value = ddl.length > 0
+                sqlOriginalText = ddl.length > 0
                     ? ddl[0].values.map(v => v[0].trim() + ';').join('\n\n')
                     : '-- no schema found';
+                const simpleParts = [];
 
                 const tableNames = tables[0].values.map(v => v[0]);
                 currentTableNames = tableNames;
@@ -846,7 +895,16 @@
                         mermaidSyntax += `    }\n`;
                     } else mermaidSyntax += `    ${tableName}\n`;
                     if (fkData.length > 0) { fkData.forEach(fk => { relationships += `    ${fk[2]} ||--o{ ${tableName} : "${fk[3]}"\n`; }); }
+
+                    simpleParts.push(buildSimpleCreate(db, tableName, colData, fkData, pks, uniqueCols));
                 });
+
+                const views = db.exec(`SELECT sql FROM sqlite_master
+                                       WHERE type <> 'table' AND sql IS NOT NULL AND name NOT LIKE 'sqlite_%'
+                                       ORDER BY name`);
+                if (views.length > 0) views[0].values.forEach(v => simpleParts.push(v[0].trim() + ';'));
+                sqlSimpleText = simpleParts.join('\n\n');
+                sqlSchemaDisplay.value = sqlSimpleToggle.checked ? sqlSimpleText : sqlOriginalText;
 
                 tableList.innerHTML = sidebarHtml;
                 schemaTextContainer.innerHTML = fullSchemaHtml;
@@ -854,7 +912,9 @@
                 mermaidCodeDisplay.value = lastGeneratedMermaidCode;
                 mermaidCodeContainer.classList.remove('hidden');
                 await renderDiagram(lastGeneratedMermaidCode);
-                document.getElementById('export-controls').classList.remove('hidden');
+                if (!document.getElementById('pane-diagram').classList.contains('hidden')) {
+                    document.getElementById('export-controls').classList.remove('hidden');
+                }
                 document.getElementById('copy-schema-btn').classList.remove('hidden');
                 document.getElementById('sqlonline-btn').classList.remove('hidden');
                 document.getElementById('copy-sql-btn').classList.remove('hidden');
@@ -895,6 +955,79 @@
                 document.getElementById('pane-' + name).classList.toggle('hidden', tab !== name);
                 document.getElementById('tab-' + name + '-btn').classList.toggle('active', tab === name);
             });
+            // the export buttons act on the diagram, so they only belong to its tab
+            document.getElementById('export-controls')
+                    .classList.toggle('hidden', tab !== 'diagram' || !currentDbData);
+        }
+
+        /* A CREATE TABLE rebuilt from the schema itself, carrying only what the
+           syllabus asks for: types, NOT NULL, UNIQUE, DEFAULT, PRIMARY KEY,
+           FOREIGN KEY and CHECK. The clauses the authoring tools leave behind -
+           ON CONFLICT, ON DELETE/UPDATE, MATCH, COLLATE - are dropped, and every
+           database comes out in the same shape however its file was written. */
+        function buildSimpleCreate(db, tableName, colData, fkData, pks, uniqueCols) {
+            const type = t => (t || '').trim().replace(/\s+\(/, '(').toUpperCase();
+            const width = (list, f) => Math.max(...list.map(x => f(x).length));
+            const nameW = width(colData, c => c[1]);
+            const typeW = width(colData, c => type(c[2]));
+
+            const lines = colData.map(c => {
+                const parts = [];
+                if (c[3] === 1) parts.push('NOT NULL');
+                if (uniqueCols.has(c[1]) && !(pks.length === 1 && pks[0] === c[1])) parts.push('UNIQUE');
+                if (c[4] !== null && c[4] !== undefined) {
+                    parts.push('DEFAULT ' + String(c[4]).replace(/^\((.*)\)$/, '$1'));
+                }
+                return ('    ' + c[1].padEnd(nameW) + ' ' + type(c[2]).padEnd(typeW) +
+                        (parts.length ? ' ' + parts.join(' ') : '')).replace(/\s+$/, '');
+            });
+
+            if (pks.length > 0) lines.push(`    PRIMARY KEY (${pks.join(', ')})`);
+
+            const grouped = {};                                          // a composite FK arrives one row per column
+            fkData.forEach(fk => {
+                const g = grouped[fk[0]] || (grouped[fk[0]] =
+                    { table: fk[2], from: [], to: [], onUpdate: fk[5], onDelete: fk[6] });
+                g.from.push(fk[3]);
+                g.to.push(fk[4] === null ? '' : fk[4]);
+            });
+            Object.keys(grouped).forEach(id => {
+                const g = grouped[id];
+                const target = g.to.every(t => t) ? `${g.table}(${g.to.join(', ')})` : g.table;
+                let clause = `    FOREIGN KEY (${g.from.join(', ')}) REFERENCES ${target}`;
+                if (g.onDelete && g.onDelete !== 'NO ACTION') clause += ` ON DELETE ${g.onDelete}`;
+                if (g.onUpdate && g.onUpdate !== 'NO ACTION') clause += ` ON UPDATE ${g.onUpdate}`;
+                lines.push(clause);
+            });
+
+            checksOf(db, tableName).forEach(c => lines.push('    ' + c));
+            return `CREATE TABLE ${tableName} (\n${lines.join(',\n')}\n);`;
+        }
+
+        /* CHECK constraints are the one thing no PRAGMA reports, so they are read
+           back out of the original statement, brackets counted so a nested one
+           survives. A CONSTRAINT name in front of it is kept: that is the form
+           SBA work is expected to use. */
+        function checksOf(db, tableName) {
+            const row = db.exec(`SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName.replace(/'/g, "''")}'`);
+            if (row.length === 0) return [];
+            const sql = row[0].values[0][0] || '';
+            const found = [];
+            const re = /(?:\bCONSTRAINT\s+("?[A-Za-z_][\w$]*"?)\s+)?\bCHECK\s*\(/gi;
+            let m;
+            while ((m = re.exec(sql)) !== null) {
+                const open = m.index + m[0].length - 1;
+                let depth = 0;
+                for (let i = open; i < sql.length; i++) {
+                    if (sql[i] === '(') depth++;
+                    else if (sql[i] === ')' && --depth === 0) {
+                        const body = sql.slice(open, i + 1).replace(/\s+/g, ' ');
+                        found.push((m[1] ? `CONSTRAINT ${m[1]} ` : '') + 'CHECK ' + body);
+                        break;
+                    }
+                }
+            }
+            return found;
         }
 
         function copySqlSchema() {

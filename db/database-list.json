@@ -2,31 +2,37 @@
   {
     "name": "Student Club DB v1 (2 tables)",
     "filename": "dbviz-01-student-club-v1.db",
-    "theme": "green"
+    "theme": "green",
+    "description": "Each student may join at most one club, so the club is just a column on the student. The starting point for normalisation: see what breaks when someone wants to join a second club."
   },
   {
     "name": "Student Club DB v2 (3 tables)",
     "filename": "dbviz-02-student-club-v2.db",
-    "theme": "aqua"
+    "theme": "aqua",
+    "description": "The same school clubs, done properly: a ClubReg table resolves the many-to-many relationship, keyed on the pair (SID, CID)."
   },
   {
     "name": "Student Club DB v3 (4 tables)",
     "filename": "dbviz-03-student-club-v3.db",
-    "theme": "noble"
+    "theme": "noble",
+    "description": "Registration now carries a school year, so the key grows to three columns and each club's teacher moves into a ClubInfo table of its own."
   },
   {
     "name": "Stationery Shop DB",
     "filename": "dbviz-04-stationery-shop.db",
-    "theme": "autumn"
+    "theme": "autumn",
+    "description": "A small shop: customers place orders, each order lists products, and every product belongs to a category. Five tables and four foreign keys."
   },
   {
     "name": "Book Loan DB (4 tables)",
     "filename": "dbviz-05-book-loan.db",
-    "theme": "classic"
+    "theme": "classic",
+    "description": "A library, where a title and a physical copy are not the same thing: BOOK is the title, BKCOPY is a copy on the shelf, and LOAN records who borrowed which copy and when."
   },
   {
     "name": "Lunch Delivery DB (4 tables)",
     "filename": "dbviz-06-lunch-delivery.db",
-    "theme": "sakura"
+    "theme": "sakura",
+    "description": "Members order lunch: one main dish, a drink if they want one, stamped with the time. Some orders have no drink, and not every member has ordered."
   }
 ]

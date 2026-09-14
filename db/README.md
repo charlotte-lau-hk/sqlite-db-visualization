@@ -28,9 +28,22 @@ it. It is a JSON array of objects:
 | --- | --- | --- |
 | `name` | yes | The label shown in the drop-down. Any text; keep it short enough to read in the header. |
 | `filename` | yes | The file name **relative to this `db/` folder**. No leading `db/`, no path. |
+| `description` | no | One or two sentences shown above the Schema Explorer, telling a student what this database is about and what it is for. |
 | `theme` | no | Colour theme to switch to when this database is chosen — for the tool *and* for SQL Online. One of the keys in [`themes/`](../themes/README.md): `frost`, `rosewater`, `silver`, `arctic`, `aurora`, `aqua`, `autumn`, `classic`, `green`, `noble`, `sakura`. |
 
 The order of the array is the order of the drop-down.
+
+### Linking to one database
+
+`?db=<filename>` opens that database directly - the link to give a class:
+
+```
+https://charlotte-lau-hk.github.io/sqlite-db-visualization/?db=dbviz-05-book-loan.db
+```
+
+The `.db` may be left off. An unknown name falls back to the random pick, with
+a note in the browser console. Choosing from the drop-down rewrites the address
+bar to match, so the URL on screen is always the one to share.
 
 ### About `theme`
 
