@@ -18,16 +18,16 @@
     "description": "Registration now carries a school year, so the key grows to three columns and each club's teacher moves into a ClubInfo table of its own."
   },
   {
-    "name": "Stationery Shop DB",
-    "filename": "dbviz-04-stationery-shop.db",
-    "theme": "autumn",
-    "description": "A small shop: customers place orders, each order lists products, and every product belongs to a category. Five tables and four foreign keys."
-  },
-  {
     "name": "Book Loan DB (4 tables)",
     "filename": "dbviz-05-book-loan.db",
     "theme": "classic",
     "description": "A library, where a title and a physical copy are not the same thing: BOOK is the title, BKCOPY is a copy on the shelf, and LOAN records who borrowed which copy and when."
+  },
+  {
+    "name": "Stationery Shop DB (5 tables)",
+    "filename": "dbviz-04-stationery-shop.db",
+    "theme": "autumn",
+    "description": "A small shop: customers place orders, each order lists products, and every product belongs to a category. Five tables and four foreign keys."
   },
   {
     "name": "Lunch Delivery DB (4 tables)",
