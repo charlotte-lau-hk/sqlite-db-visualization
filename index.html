@@ -564,7 +564,7 @@
         };
 
         // The theme is not something the student picks: it comes from the "theme"
-        // key of the chosen database in db/sample-database.json, so the colour on
+        // key of the chosen database in db/database-list.json, so the colour on
         // screen always says which exercise is open.
         function applyTheme(name, rerender) {
             currentTheme = THEMES[name] ? name : DEFAULT_THEME;
@@ -574,10 +574,10 @@
         }
 
         /* ==================== SAMPLE DATABASE INDEX ====================
-           db/sample-database.json lists the exercise databases; the format is
+           db/database-list.json lists the exercise databases; the format is
            documented in db/README.md. */
         const DB_DIR = 'db/';
-        const SAMPLE_INDEX = DB_DIR + 'sample-database.json';
+        const SAMPLE_INDEX = DB_DIR + 'database-list.json';
         let sampleIndex = [];           // the parsed list, kept for the per-database theme
 
         async function loadSampleIndex() {

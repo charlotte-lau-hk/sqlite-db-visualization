@@ -24,7 +24,7 @@ Each theme in the tool has two halves:
 | `sakura` | Sakura | from sql_teaching (`color-sakura.themes`) |
 
 A theme is **pinned to a database** with the `theme` key in
-`db/sample-database.json`, and that is the only way one is selected: choosing
+`db/database-list.json`, and that is the only way one is selected: choosing
 that exercise switches both halves at once. There is no theme picker in the
 interface, so the colour on screen always identifies the database. See
 [`db/README.md`](../db/README.md).
@@ -90,7 +90,7 @@ groups SQL Online itself uses:
    same file.
 3. Save a `<key>.themes` file here. The name must match the key exactly, because
    the link is built as `themes/<key>.themes`.
-   Then reference `<key>` from a database in `db/sample-database.json`.
+   Then reference `<key>` from a database in `db/database-list.json`.
 4. Check the contrast of the new skin before committing it: every colour in the
    *Code editor* group against `bgc-e`, the *Fonts* group against `bgc-d` (or
    `bgc-c` for `color-a`), and the tree logos against `bgc-c`.

@@ -2,9 +2,9 @@
 
 This folder is the **exercise repository** for the
 [SQLite DB Visualization tool](https://charlotte-lau-hk.github.io/sqlite-db-visualization/):
-the `.db` files themselves, plus `sample-database.json`, which lists them.
+the `.db` files themselves, plus `database-list.json`, which lists them.
 
-## `sample-database.json`
+## `database-list.json`
 
 The tool fetches this file on start-up and fills the **Samples** drop-down from
 it. It is a JSON array of objects:
@@ -61,12 +61,12 @@ dbviz-NN-topic[-vN].db
   the three Student Club versions are.
 
 The matching SQL source in `schema/` carries the same stem. Students never see
-any of this: the `name` in `sample-database.json` is the only label they read.
+any of this: the `name` in `database-list.json` is the only label they read.
 
 ## Adding an exercise database
 
 1. Put the `.db` file in this folder.
-2. Add an object to the array in `sample-database.json`.
+2. Add an object to the array in `database-list.json`.
 3. Add a row to the table below, so the folder documents itself.
 4. Run `python3 tools/dump-schema.py` to write its SQL source to `schema/`,
    and commit that alongside the database.
@@ -101,8 +101,9 @@ Things to watch for:
 | Student Club DB v3 (4 tables) | `dbviz-03-student-club-v3.db` | Noble | Club, ClubInfo, Student, ClubReg | Adds a school year to the registration, giving a three-column composite key. Also carries a `ClubRecord` view (the tool shows tables only). |
 | Stationery Shop DB | `dbviz-04-stationery-shop.db` | Autumn | Category, Customer, Product, Orders, Order_Item | A small sales database: customers place orders, orders contain products. |
 | Book Loan DB (4 tables) | `dbviz-05-book-loan.db` | Classic | READER, BOOK, BKCOPY, LOAN | A library: a title (`BOOK`) has physical copies (`BKCOPY`), and a loan is a copy borrowed by a reader on a date. Composite primary key on `LOAN`, 8 of the 12 loans still open. |
+| Lunch Delivery DB (4 tables) | `dbviz-06-lunch-delivery.db` | Sakura | MainDish, Drink, Member, LunchOrder | A lunch order joins a member, a main dish and (optionally) a drink. `LunchOrder` is keyed on `(member_id, orderTime)`; one order has no drink, one member never orders and one dish is never ordered, so outer joins have something to find. |
 
-This table is documentation only — the tool reads `sample-database.json`, not
+This table is documentation only — the tool reads `database-list.json`, not
 this README.
 
 ## How these files are built

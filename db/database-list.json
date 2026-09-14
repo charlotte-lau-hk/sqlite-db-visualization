@@ -23,5 +23,10 @@
     "name": "Book Loan DB (4 tables)",
     "filename": "dbviz-05-book-loan.db",
     "theme": "classic"
+  },
+  {
+    "name": "Lunch Delivery DB (4 tables)",
+    "filename": "dbviz-06-lunch-delivery.db",
+    "theme": "sakura"
   }
 ]

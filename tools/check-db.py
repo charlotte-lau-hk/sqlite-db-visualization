@@ -31,7 +31,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_DIR = os.path.join(ROOT, 'db')
 THEME_DIR = os.path.join(ROOT, 'themes')
 SCHEMA_DIR = os.path.join(ROOT, 'schema')
-INDEX = os.path.join(DB_DIR, 'sample-database.json')
+INDEX = os.path.join(DB_DIR, 'database-list.json')
 
 errors = []
 warnings = []
@@ -222,10 +222,10 @@ def check_schema_source(path):
 
 
 def check_index():
-    print('\nsample-database.json')
-    print('--------------------')
+    print('\n%s' % os.path.basename(INDEX))
+    print('-' * len(os.path.basename(INDEX)))
     if not os.path.exists(INDEX):
-        err('index', 'db/sample-database.json is missing - the Samples list will be empty')
+        err('index', 'db/database-list.json is missing - the Samples list will be empty')
         return
     try:
         with open(INDEX, encoding='utf-8') as fh:
