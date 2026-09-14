@@ -18,5 +18,10 @@
     "name": "Stationery Shop DB",
     "filename": "db3_stationery_shop.db",
     "theme": "autumn"
+  },
+  {
+    "name": "Book Loan DB (4 tables)",
+    "filename": "db4-book_loan.db",
+    "theme": "classic"
   }
 ]

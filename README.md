@@ -29,6 +29,7 @@ db/*.db                      The exercise databases themselves
 db/README.md                 Documents that JSON file and what each database contains
 themes/*.themes              SQL Online skins, one per theme
 themes/README.md             Documents the skin format and the link SQL Online expects
+tools/check-db.py            Validates db/*.db and the JSON index before committing
 ```
 
 ### Adding an exercise database

@@ -48,6 +48,12 @@ is not that exercise.
 1. Put the `.db` file in this folder.
 2. Add an object to the array in `sample-database.json`.
 3. Add a row to the table below, so the folder documents itself.
+4. Run `python3 tools/check-db.py` from the repository root before committing.
+   It reads every database here and this JSON file, and reports anything that
+   would misbehave in the tool: a table with no primary key, a schema with no
+   foreign keys (the ER diagram would be isolated boxes), a broken or duplicated
+   foreign key, orphan rows, a listed file that is missing, a theme that does
+   not exist. It exits non-zero when it finds an error.
 
 Things to watch for:
 
@@ -57,7 +63,8 @@ Things to watch for:
   console says why).
 - Keep the file name free of spaces and non-ASCII characters; it travels inside
   a URL when a student clicks **Practice SQL**.
-- An unknown `theme` value is ignored and the tool falls back to `frost`.
+- An unknown `theme` value is ignored and the tool falls back to `frost`
+  (`tools/check-db.py` reports it as an error).
 - Give two databases the same `theme` only if you do not mind them looking
   identical — the colour is what distinguishes them on screen.
 - The file must actually be committed and pushed, or the drop-down entry will
@@ -67,10 +74,42 @@ Things to watch for:
 
 | Database | File | Theme | Tables | Notes |
 | --- | --- | --- | --- | --- |
-| Student Club DB v1 | `db2a-student_club_v1.db` | Green | Clubs, Students | One-to-many: each student joins at most one club. Starting point for normalisation. |
-| Student Club DB v2 | `db2b-student_club_v2.db` | Aqua | Clubs, Students, ClubReg | Many-to-many resolved with the `ClubReg` link table (composite primary key). |
-| Student Club DB v3 | `db2c-student_club_v3.db` | Noble | Club, ClubInfo, Student, ClubReg | Adds a school year to the registration, giving a three-column composite key. |
+| Student Club DB v1 (2 tables) | `db2a-student_club_v1.db` | Green | Clubs, Students | One-to-many: each student joins at most one club. Starting point for normalisation. |
+| Student Club DB v2 (3 tables) | `db2b-student_club_v2.db` | Aqua | Clubs, Students, ClubReg | Many-to-many resolved with the `ClubReg` link table. |
+| Student Club DB v3 (4 tables) | `db2c-student_club_v3.db` | Noble | Club, ClubInfo, Student, ClubReg | Adds a school year to the registration, giving a three-column composite key. Also carries a `ClubRecord` view (the tool shows tables only). |
 | Stationery Shop DB | `db3_stationery_shop.db` | Autumn | Category, Customer, Product, Orders, Order_Item | A small sales database: customers place orders, orders contain products. |
+| Book Loan DB (4 tables) | `db4-book_loan.db` | Classic | READER, BOOK, BKCOPY, LOAN | A library: a title (`BOOK`) has physical copies (`BKCOPY`), and a loan is a copy borrowed by a reader on a date. Composite primary key on `LOAN`, 8 of the 12 loans still open. |
 
 This table is documentation only — the tool reads `sample-database.json`, not
 this README.
+
+## How these files are built
+
+The reliable way to author one is to keep the schema as SQL text and generate
+the database from it:
+
+```bash
+sqlite3 db/db5-new_exercise.db < schema/db5-new_exercise.sql
+python3 tools/check-db.py
+```
+
+Write the `CREATE TABLE` statements by hand, with table-level `FOREIGN KEY`
+clauses. A composite foreign key must be **one** clause naming every column:
+
+```sql
+CREATE TABLE ClubReg (
+  CID   CHAR(4),
+  Syear INT,
+  SID   CHAR(4),
+  PRIMARY KEY (CID, Syear, SID),
+  FOREIGN KEY (CID, Syear) REFERENCES ClubInfo(CID, Syear),
+  FOREIGN KEY (SID)        REFERENCES Student(SID)
+);
+```
+
+Graphical editors are fine for typing in data, but their table designers tend to
+write a column-level `REFERENCES` next to each column *in addition* to the
+clause you wrote. When one of those points at a single column of a composite
+key, SQLite rejects every later write with `foreign key mismatch`, and the ER
+diagram grows duplicate lines. Re-run `tools/check-db.py` after any save from a
+GUI - that is exactly the fault it was written to catch.
