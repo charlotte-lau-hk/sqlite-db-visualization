@@ -328,7 +328,7 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
                     <div class="text-[11px] hdr-muted flex items-center gap-2 flex-wrap">
-                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-3</span>
+                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-4</span>
                         <span class="opacity-30">|</span>
                         <div class="flex items-center gap-1.5">
                             <span>Created by</span>
@@ -420,6 +420,7 @@
                     <div class="flex gap-8">
                         <button onclick="switchTab('diagram')" id="tab-diagram-btn" class="tab-btn active py-5 text-xs font-extrabold uppercase tracking-widest transition-all">ER Diagram</button>
                         <button onclick="switchTab('schema')" id="tab-schema-btn" class="tab-btn py-5 text-xs font-extrabold uppercase tracking-widest transition-all">Relational Schema</button>
+                        <button onclick="switchTab('sql')" id="tab-sql-btn" class="tab-btn py-5 text-xs font-extrabold uppercase tracking-widest transition-all">SQL Schema</button>
                     </div>
                     
                     <div id="export-controls" class="hidden flex gap-2">
@@ -494,6 +495,24 @@
                             <p class="text-slate-400 italic">No database analyzed yet.</p>
                         </div>
                     </div>
+
+                    <!-- Tab 3: SQL Schema Pane -->
+                    <div id="pane-sql" class="hidden h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">SQL Schema (CREATE statements)</h3>
+                            <div class="flex items-center gap-5">
+                                <a id="full-sql-link" href="#" target="_blank" rel="noopener"
+                                   title="The complete SQL source of this database, rows included"
+                                   class="hidden text-[10px] font-bold accent-text uppercase tracking-wide items-center gap-1.5 hover:underline">
+                                    <i class="fas fa-file-download"></i> Full SQL with data
+                                </a>
+                                <button onclick="copySqlSchema()" id="copy-sql-btn" class="hidden bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-md text-[10px] font-bold text-slate-500 border border-slate-200 transition uppercase tracking-wide">
+                                    <i class="fas fa-copy mr-2"></i> Copy SQL
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="sql-schema-display" readonly class="code-font w-full flex-grow p-6 rounded-xl mermaid-code-box border border-slate-800 focus:outline-none resize-none"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
@@ -514,6 +533,7 @@
         const tableList = document.getElementById('table-list');
         const diagramContainer = document.getElementById('diagram-container');
         const schemaTextContainer = document.getElementById('schema-text-container');
+        const sqlSchemaDisplay = document.getElementById('sql-schema-display');
         const mermaidCodeDisplay = document.getElementById('mermaid-code-display');
         const mermaidCodeContainer = document.getElementById('mermaid-code-container');
         const loader = document.getElementById('loader');
@@ -578,6 +598,7 @@
            documented in db/README.md. */
         const DB_DIR = 'db/';
         const SAMPLE_INDEX = DB_DIR + 'database-list.json';
+        const SCHEMA_DIR = 'schema/';
         let sampleIndex = [];           // the parsed list, kept for the per-database theme
 
         async function loadSampleIndex() {
@@ -595,7 +616,14 @@
                 opt.textContent = db.name || db.filename;
                 dbSelect.appendChild(opt);
             });
-            if (samples.length === 0) console.warn('No sample databases listed in ' + SAMPLE_INDEX + '.');
+            if (samples.length === 0) {
+                console.warn('No sample databases listed in ' + SAMPLE_INDEX + '.');
+                return;
+            }
+            // Start on one of the exercises, picked at random, so the tool opens
+            // with something to look at instead of an empty canvas.
+            dbSelect.value = sampleIndex[Math.floor(Math.random() * sampleIndex.length)].filename;
+            await loadSelectedSample();
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -716,6 +744,15 @@
                 const db = new SQL.Database(new Uint8Array(buffer));
                 const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
                 if (tables.length === 0) { alert("No valid tables found."); loader.classList.add('hidden'); return; }
+                // The DDL the browser already holds - no fetch, and it works for a
+                // database the student loaded from their own disk too.
+                const ddl = db.exec(`SELECT sql FROM sqlite_master
+                                     WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%'
+                                     ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END, name`);
+                sqlSchemaDisplay.value = ddl.length > 0
+                    ? ddl[0].values.map(v => v[0].trim() + ';').join('\n\n')
+                    : '-- no schema found';
+
                 const tableNames = tables[0].values.map(v => v[0]);
                 currentTableNames = tableNames;
                 tableCount.innerText = tableNames.length;
@@ -820,6 +857,16 @@
                 document.getElementById('export-controls').classList.remove('hidden');
                 document.getElementById('copy-schema-btn').classList.remove('hidden');
                 document.getElementById('sqlonline-btn').classList.remove('hidden');
+                document.getElementById('copy-sql-btn').classList.remove('hidden');
+                const fullSql = document.getElementById('full-sql-link');
+                if (currentSampleFile) {                                 // schema/ only holds the samples
+                    fullSql.href = SCHEMA_DIR + currentSampleFile.replace(/\.[^.]+$/, '') + '.sql';
+                    fullSql.classList.remove('hidden');
+                    fullSql.classList.add('flex');
+                } else {
+                    fullSql.classList.add('hidden');
+                    fullSql.classList.remove('flex');
+                }
             } catch (err) { alert("Error: " + err.message); } finally { loader.classList.add('hidden'); }
         }
 
@@ -844,10 +891,17 @@
         }
 
         function switchTab(tab) {
-            document.getElementById('pane-diagram').classList.toggle('hidden', tab !== 'diagram');
-            document.getElementById('pane-schema').classList.toggle('hidden', tab !== 'schema');
-            document.getElementById('tab-diagram-btn').classList.toggle('active', tab === 'diagram');
-            document.getElementById('tab-schema-btn').classList.toggle('active', tab === 'schema');
+            ['diagram', 'schema', 'sql'].forEach(name => {
+                document.getElementById('pane-' + name).classList.toggle('hidden', tab !== name);
+                document.getElementById('tab-' + name + '-btn').classList.toggle('active', tab === name);
+            });
+        }
+
+        function copySqlSchema() {
+            sqlSchemaDisplay.select(); document.execCommand('copy');
+            const btn = document.getElementById('copy-sql-btn');
+            btn.innerHTML = '<i class="fas fa-check mr-2 text-emerald-500"></i> COPIED!';
+            setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy mr-2 text-slate-400"></i> COPY SQL'; }, 2000);
         }
 
         function copySchemaText() {

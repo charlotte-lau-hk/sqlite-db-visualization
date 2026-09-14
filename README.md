@@ -11,10 +11,11 @@ Access the tool here: [https://charlotte-lau-hk.github.io/sqlite-db-visualizatio
 - **Rapid Modeling:** Convert physical `.db` files into conceptual ER diagrams instantly.
 
 ## 🛠️ Key Functionalities
-- **Integrated Dashboard:** A unified, one-piece interface for exploring table structures and viewing diagrams side-by-side.
+- **Integrated Dashboard:** A unified, one-piece interface for exploring table structures and viewing diagrams side-by-side. It opens on one of the exercise databases, picked at random, rather than an empty canvas.
 - **Schema Explorer:** Drill down into specific tables to see field-level integrity badges (PK, FK, NN, UQ).
 - **Vertical ER Diagrams:** Optimized for desktop PC usage with a Top-to-Bottom flow that matches relational hierarchy.
-- **DSE Format Schema Text:** Automatically generates relational schema text in the format used in past DSE exam papers (Paper 1B / 2C).
+- **DSE Format Schema Text:** Automatically generates relational schema text in the format used in past DSE exam papers (Paper 1B / 2C), with the primary key underlined as the papers write it.
+- **SQL Schema Tab:** Shows the `CREATE TABLE` statements read straight out of the loaded database, so students can compare the diagram, the DSE notation and the SQL that produced both. Works for a file a student loads themselves; for the sample databases it also links to the complete SQL source, rows included.
 - **Interactive Export:** Export diagrams as high-resolution PNG (1600px) or scalable SVG files for worksheets.
 - **Mermaid Live Lab:** One-click integration with the official Mermaid Live Editor to help students learn and experiment with Mermaid DSL syntax.
 - **Practice SQL Online:** One click hands the loaded database to [SQLite Online](https://sqliteonline.com/), which downloads it and opens a query tab with a starter `SELECT`, so students can write SQL against the very schema they are looking at.
