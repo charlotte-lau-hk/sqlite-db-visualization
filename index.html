@@ -263,6 +263,9 @@
         }
 
         .code-font { font-family: 'Source Code Pro', 'Fira Code', monospace; }
+
+        /* DSE relational schema: the primary key is underlined */
+        #schema-text-container u { text-decoration: underline; text-underline-offset: 3px; }
         
         #diagram-container svg { 
             width: 100%; 
@@ -324,7 +327,7 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
                     <div class="text-[11px] hdr-muted flex items-center gap-2 flex-wrap">
-                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-1</span>
+                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-2</span>
                         <span class="opacity-30">|</span>
                         <div class="flex items-center gap-1.5">
                             <span>Created by</span>
@@ -718,7 +721,7 @@
                 let mermaidSyntax = "erDiagram\n";
                 let relationships = "";
                 let sidebarHtml = "";
-                let fullSchemaText = "";
+                let fullSchemaHtml = "";
                 const showFields = fieldToggle.checked;
 
                 tableNames.forEach(tableName => {
@@ -729,13 +732,17 @@
                     const fkData = fks.length > 0 ? fks[0].values : [];
                     const pks = colData.filter(c => c[5] > 0).sort((a,b) => a[5] - b[5]).map(c => c[1]);
                     const allCols = colData.map(c => c[1]);
-                    fullSchemaText += `${tableName} (${allCols.join(', ')})\n`;
-                    if (pks.length > 0) fullSchemaText += `  Primary key: ${pks.join(' + ')}\n`;
+                    const pkSet = new Set(pks);
+                    const colsHtml = allCols.map(c => pkSet.has(c)
+                        ? `<u>${escapeHtml(c)}</u>`            // DSE format: the key is underlined
+                        : escapeHtml(c)).join(', ');
+                    fullSchemaHtml += `${escapeHtml(tableName)} (${colsHtml})\n`;
+                    if (pks.length > 0) fullSchemaHtml += `  Primary key: ${escapeHtml(pks.join(' + '))}\n`;
                     if (fkData.length > 0) {
-                        fullSchemaText += `  Foreign key:\n`;
-                        fkData.forEach(f => { fullSchemaText += `  - ${f[3]} references ${f[4]} of ${f[2]}\n`; });
+                        fullSchemaHtml += `  Foreign key:\n`;
+                        fkData.forEach(f => { fullSchemaHtml += `  - ${escapeHtml(f[3])} references ${escapeHtml(f[4])} of ${escapeHtml(f[2])}\n`; });
                     }
-                    fullSchemaText += `\n`;
+                    fullSchemaHtml += `\n`;
 
                     let uniqueCols = new Set();
                     if (indices.length > 0) {
@@ -804,7 +811,7 @@
                 });
 
                 tableList.innerHTML = sidebarHtml;
-                schemaTextContainer.innerText = fullSchemaText;
+                schemaTextContainer.innerHTML = fullSchemaHtml;
                 lastGeneratedMermaidCode = mermaidSyntax + relationships;
                 mermaidCodeDisplay.value = lastGeneratedMermaidCode;
                 mermaidCodeContainer.classList.remove('hidden');
