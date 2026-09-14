@@ -30,7 +30,7 @@ db/README.md                 Documents that JSON file and what each database con
 schema/*.sql                 SQL source of each database - rebuilds it exactly
 themes/*.themes              SQL Online skins, one per theme
 themes/README.md             Documents the skin format and the link SQL Online expects
-tools/check-db.py            Validates db/*.db and the JSON index before committing
+tools/check-db.py            Validates db/*.db, schema/*.sql and the JSON index
 tools/dump-schema.py         Regenerates schema/*.sql from db/*.db
 ```
 

@@ -33,7 +33,43 @@ HEADER = """-- %(name)s
 --     sqlite3 db/%(file)s < schema/%(stem)s.sql
 -- Then check it with:
 --     python3 tools/check-db.py
+--
+-- Tables are written parents first, so the rows load with foreign keys
+-- enforced. "PRAGMA foreign_keys" is per connection and has no effect inside a
+-- transaction, which is why it is set before BEGIN: SQLite ignores it
+-- otherwise, and the setting is not stored in the database file.
 """
+
+
+def sql_value(value):
+    """One value as SQL text - the same forms sqlite3's own .dump uses."""
+    if value is None:
+        return 'NULL'
+    if isinstance(value, (int, float)):
+        return repr(value)
+    if isinstance(value, bytes):
+        return "X'%s'" % value.hex().upper()
+    return "'%s'" % str(value).replace("'", "''")
+
+
+def table_order(con, tables):
+    """Parents before children, so inserts never precede what they reference."""
+    parents = {t: set() for t in tables}
+    for table in tables:
+        for fk in con.execute('PRAGMA foreign_key_list("%s")' % table):
+            if fk[2] in parents and fk[2] != table:
+                parents[table].add(fk[2])
+    ordered, remaining = [], dict(parents)
+    while remaining:
+        ready = sorted(t for t, deps in remaining.items()
+                       if not (deps - set(ordered)))
+        if not ready:                      # a cycle: keep the rest as they come
+            ordered.extend(sorted(remaining))
+            break
+        ordered.extend(ready)
+        for t in ready:
+            del remaining[t]
+    return ordered
 
 
 def dump(path):
@@ -42,17 +78,39 @@ def dump(path):
     con = sqlite3.connect('file:%s?mode=ro' % path, uri=True)
     tables = [r[0] for r in con.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
-    body = '\n'.join(con.iterdump())
+    ordered = table_order(con, tables)
+
+    lines = [HEADER % {'name': stem, 'file': name, 'stem': stem},
+             '', 'PRAGMA foreign_keys = ON;', '', 'BEGIN TRANSACTION;', '']
+    for table in ordered:
+        create = con.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()[0]
+        lines.append(create.strip() + ';')
+        columns = ', '.join('"%s"' % r[1] for r in con.execute('PRAGMA table_info("%s")' % table))
+        for row in con.execute('SELECT * FROM "%s"' % table):
+            lines.append('INSERT INTO "%s" (%s) VALUES (%s);'
+                         % (table, columns, ', '.join(sql_value(v) for v in row)))
+        lines.append('')
+
+    extras = list(con.execute(
+        "SELECT type, name, sql FROM sqlite_master "
+        "WHERE type<>'table' AND sql IS NOT NULL ORDER BY type, name"))
+    if extras:
+        lines.append('-- indexes, views and triggers')
+        for kind, extra_name, create in extras:
+            lines.append(create.strip() + ';')
+        lines.append('')
+
+    lines += ['COMMIT;', '',
+              '-- should report nothing:', 'PRAGMA foreign_key_check;', '']
     con.close()
 
     out = os.path.join(SCHEMA_DIR, stem + '.sql')
     os.makedirs(SCHEMA_DIR, exist_ok=True)
     with open(out, 'w', encoding='utf-8', newline='\n') as fh:
-        fh.write(HEADER % {'name': stem, 'file': name, 'stem': stem})
-        fh.write('\n')
-        fh.write(body)
-        fh.write('\n')
-    print('schema/%-28s %d table(s), %d lines' % (stem + '.sql', len(tables), body.count('\n') + 1))
+        fh.write('\n'.join(lines))
+    print('schema/%-28s %d table(s), order: %s'
+          % (stem + '.sql', len(tables), ' -> '.join(ordered)))
 
 
 def main():

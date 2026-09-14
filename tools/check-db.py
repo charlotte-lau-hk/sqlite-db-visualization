@@ -30,6 +30,7 @@ import tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_DIR = os.path.join(ROOT, 'db')
 THEME_DIR = os.path.join(ROOT, 'themes')
+SCHEMA_DIR = os.path.join(ROOT, 'schema')
 INDEX = os.path.join(DB_DIR, 'sample-database.json')
 
 errors = []
@@ -79,6 +80,16 @@ def check_database(path):
         if not pks[table]:
             err(name, '%s has no PRIMARY KEY - no PK badge, and entity integrity '
                       'cannot be shown' % table)
+        # SQLite keeps a long-standing quirk: a PRIMARY KEY column accepts NULL
+        # unless it is declared NOT NULL. The exception is a lone INTEGER
+        # PRIMARY KEY, which is the rowid - a NULL there is auto-assigned.
+        rowid_alias = len(pks[table]) == 1 and any(
+            r[5] > 0 and (r[2] or '').upper() == 'INTEGER' for r in info)
+        if not rowid_alias:
+            for r in info:
+                if r[5] > 0 and not r[3]:
+                    warn(name, '%s.%s is part of the primary key but is not NOT NULL, '
+                               'so SQLite would accept a NULL there' % (table, r[1]))
         for r in info:
             if not (r[2] or '').strip():
                 warn(name, '%s.%s has no declared type; the diagram prints the type '
@@ -168,6 +179,48 @@ def check_database(path):
     con.close()
 
 
+def check_schema_source(path):
+    """schema/<name>.sql must rebuild exactly the database it stands for."""
+    name = os.path.basename(path)
+    stem = os.path.splitext(name)[0]
+    source = os.path.join(SCHEMA_DIR, stem + '.sql')
+    if not os.path.exists(source):
+        warn(name, 'schema/%s.sql is missing - run tools/dump-schema.py' % stem)
+        return
+    tmp = tempfile.mkdtemp()
+    try:
+        rebuilt = sqlite3.connect(os.path.join(tmp, name))
+        try:
+            rebuilt.executescript(open(source, encoding='utf-8').read())
+            rebuilt.commit()
+        except sqlite3.Error as exc:
+            err(name, 'schema/%s.sql does not load: %s' % (stem, exc))
+            return
+        original = sqlite3.connect('file:%s?mode=ro' % path, uri=True)
+        want = sorted((n, sql) for n, sql in original.execute(
+            'SELECT name, sql FROM sqlite_master WHERE sql IS NOT NULL'))
+        got = sorted((n, sql) for n, sql in rebuilt.execute(
+            'SELECT name, sql FROM sqlite_master WHERE sql IS NOT NULL'))
+        if want != got:
+            err(name, 'schema/%s.sql is out of step with the database - '
+                      'run tools/dump-schema.py' % stem)
+        else:
+            tables = [r[0] for r in original.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
+            for table in tables:
+                if sorted(original.execute('SELECT * FROM "%s"' % table)) != \
+                        sorted(rebuilt.execute('SELECT * FROM "%s"' % table)):
+                    err(name, 'schema/%s.sql rebuilds %s with different rows - '
+                              'run tools/dump-schema.py' % (stem, table))
+                    break
+            else:
+                ok('schema/%s.sql rebuilds it exactly' % stem)
+        original.close()
+        rebuilt.close()
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def check_index():
     print('\nsample-database.json')
     print('--------------------')
@@ -225,6 +278,8 @@ def main():
     if targets:
         for path in targets:
             check_database(path)
+            if os.path.dirname(os.path.abspath(path)) == DB_DIR:
+                check_schema_source(path)
     else:
         files = sorted(f for f in os.listdir(DB_DIR)
                        if f.endswith(('.db', '.sqlite', '.sqlite3')))
@@ -232,7 +287,9 @@ def main():
             print('No databases found in %s' % DB_DIR)
             return 1
         for f in files:
-            check_database(os.path.join(DB_DIR, f))
+            path = os.path.join(DB_DIR, f)
+            check_database(path)
+            check_schema_source(path)
         check_index()
 
     print('\n%s' % ('=' * 60))

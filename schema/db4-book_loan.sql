@@ -5,76 +5,92 @@
 --     sqlite3 db/db4-book_loan.db < schema/db4-book_loan.sql
 -- Then check it with:
 --     python3 tools/check-db.py
+--
+-- Tables are written parents first, so the rows load with foreign keys
+-- enforced. "PRAGMA foreign_keys" is per connection and has no effect inside a
+-- transaction, which is why it is set before BEGIN: SQLite ignores it
+-- otherwise, and the setting is not stored in the database file.
+
+
+PRAGMA foreign_keys = ON;
 
 BEGIN TRANSACTION;
-CREATE TABLE BKCOPY (
-    ITEMNO CHAR(6) PRIMARY KEY, -- Assuming format BxxxxN (BookID + CopyNum)
-    BID CHAR(4),
-    FOREIGN KEY (BID) REFERENCES BOOK(BID)
-);
-INSERT INTO "BKCOPY" VALUES('B78901','B789');
-INSERT INTO "BKCOPY" VALUES('B78902','B789');
-INSERT INTO "BKCOPY" VALUES('B10101','B101');
-INSERT INTO "BKCOPY" VALUES('B10201','B102');
-INSERT INTO "BKCOPY" VALUES('B22201','B222');
-INSERT INTO "BKCOPY" VALUES('B22202','B222');
-INSERT INTO "BKCOPY" VALUES('B34501','B345');
-INSERT INTO "BKCOPY" VALUES('B40001','B400');
-INSERT INTO "BKCOPY" VALUES('B51001','B510');
-INSERT INTO "BKCOPY" VALUES('B51002','B510');
-INSERT INTO "BKCOPY" VALUES('B51501','B515');
-INSERT INTO "BKCOPY" VALUES('B62001','B620');
+
 CREATE TABLE BOOK (
-    BID CHAR(4) PRIMARY KEY,
+    BID CHAR(4) NOT NULL PRIMARY KEY,
     TITLE VARCHAR(100),
     CAT VARCHAR(50),
     AUTHOR VARCHAR(50)
 );
-INSERT INTO "BOOK" VALUES('B789','Computer Literacy','Technology','A. B. Chan');
-INSERT INTO "BOOK" VALUES('B101','Advanced Calculus','Mathematics','C. D. Evans');
-INSERT INTO "BOOK" VALUES('B102','Introduction to Physics','Science','E. F. Garcia');
-INSERT INTO "BOOK" VALUES('B222','History of Hong Kong','History','G. H. Ivan');
-INSERT INTO "BOOK" VALUES('B345','The Art of Programming','Technology','A. B. Chan');
-INSERT INTO "BOOK" VALUES('B400','Modern Chemistry','Science','J. K. Lopez');
-INSERT INTO "BOOK" VALUES('B401','World Atlas','Geography','L. M. Nelson');
-INSERT INTO "BOOK" VALUES('B510','Introduction to Databases','Technology','S. T. User');
-INSERT INTO "BOOK" VALUES('B515','Digital Photography','Arts','O. P. Quinn');
-INSERT INTO "BOOK" VALUES('B620','Economic Principles','Economics','R. S. Taylor');
-INSERT INTO "BOOK" VALUES('B625','Classic Literature','Literature','U. V. White');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B789', 'Computer Literacy', 'Technology', 'A. B. Chan');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B101', 'Advanced Calculus', 'Mathematics', 'C. D. Evans');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B102', 'Introduction to Physics', 'Science', 'E. F. Garcia');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B222', 'History of Hong Kong', 'History', 'G. H. Ivan');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B345', 'The Art of Programming', 'Technology', 'A. B. Chan');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B400', 'Modern Chemistry', 'Science', 'J. K. Lopez');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B401', 'World Atlas', 'Geography', 'L. M. Nelson');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B510', 'Introduction to Databases', 'Technology', 'S. T. User');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B515', 'Digital Photography', 'Arts', 'O. P. Quinn');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B620', 'Economic Principles', 'Economics', 'R. S. Taylor');
+INSERT INTO "BOOK" ("BID", "TITLE", "CAT", "AUTHOR") VALUES ('B625', 'Classic Literature', 'Literature', 'U. V. White');
+
+CREATE TABLE READER (
+    RID CHAR(4) NOT NULL PRIMARY KEY,
+    NAME VARCHAR(50)  -- Using VARCHAR as names vary in length
+);
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R123', 'Peter Chan');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R124', 'Alice Wong');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R225', 'David Lee');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R301', 'Mary Lamb');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R305', 'John Smith');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R410', 'Emily White');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R411', 'Chris Green');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R500', 'Jessica Blue');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R502', 'Michael Brown');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R600', 'Sarah King');
+INSERT INTO "READER" ("RID", "NAME") VALUES ('R601', 'Kenji Tanaka');
+
+CREATE TABLE BKCOPY (
+    ITEMNO CHAR(6) NOT NULL PRIMARY KEY, -- Assuming format BxxxxN (BookID + CopyNum)
+    BID CHAR(4),
+    FOREIGN KEY (BID) REFERENCES BOOK(BID)
+);
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B78901', 'B789');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B78902', 'B789');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B10101', 'B101');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B10201', 'B102');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B22201', 'B222');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B22202', 'B222');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B34501', 'B345');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B40001', 'B400');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B51001', 'B510');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B51002', 'B510');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B51501', 'B515');
+INSERT INTO "BKCOPY" ("ITEMNO", "BID") VALUES ('B62001', 'B620');
+
 CREATE TABLE LOAN (
-    ITEMNO CHAR(6),
-    RID CHAR(4),
-    DOB DATE,          -- Date of Borrowing
+    ITEMNO CHAR(6) NOT NULL,
+    RID CHAR(4) NOT NULL,
+    DOB DATE NOT NULL, -- Date of Borrowing
     DOR DATE,          -- Date of Return (NULL if not returned)
     PRIMARY KEY (ITEMNO, RID, DOB), -- Composite key, assumes reader cannot borrow same item same day
     FOREIGN KEY (ITEMNO) REFERENCES BKCOPY(ITEMNO),
     FOREIGN KEY (RID) REFERENCES READER(RID)
 );
-INSERT INTO "LOAN" VALUES('B78901','R123','2025-03-01',NULL);
-INSERT INTO "LOAN" VALUES('B22202','R123','2025-03-02','2025-03-16');
-INSERT INTO "LOAN" VALUES('B34501','R225','2025-03-07','2025-03-21');
-INSERT INTO "LOAN" VALUES('B10201','R124','2025-03-10',NULL);
-INSERT INTO "LOAN" VALUES('B51001','R301','2025-03-12','2025-03-28');
-INSERT INTO "LOAN" VALUES('B78902','R305','2025-03-15',NULL);
-INSERT INTO "LOAN" VALUES('B22201','R123','2025-03-18',NULL);
-INSERT INTO "LOAN" VALUES('B51002','R410','2025-03-20',NULL);
-INSERT INTO "LOAN" VALUES('B51501','R411','2025-03-22','2025-04-01');
-INSERT INTO "LOAN" VALUES('B62001','R500','2025-03-25',NULL);
-INSERT INTO "LOAN" VALUES('B78901','R124','2025-03-28',NULL);
-INSERT INTO "LOAN" VALUES('B10101','R502','2025-04-01',NULL);
-CREATE TABLE READER (
-    RID CHAR(4) PRIMARY KEY,
-    NAME VARCHAR(50)  -- Using VARCHAR as names vary in length
-);
-INSERT INTO "READER" VALUES('R123','Peter Chan');
-INSERT INTO "READER" VALUES('R124','Alice Wong');
-INSERT INTO "READER" VALUES('R225','David Lee');
-INSERT INTO "READER" VALUES('R301','Mary Lamb');
-INSERT INTO "READER" VALUES('R305','John Smith');
-INSERT INTO "READER" VALUES('R410','Emily White');
-INSERT INTO "READER" VALUES('R411','Chris Green');
-INSERT INTO "READER" VALUES('R500','Jessica Blue');
-INSERT INTO "READER" VALUES('R502','Michael Brown');
-INSERT INTO "READER" VALUES('R600','Sarah King');
-INSERT INTO "READER" VALUES('R601','Kenji Tanaka');
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B78901', 'R123', '2025-03-01', NULL);
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B22202', 'R123', '2025-03-02', '2025-03-16');
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B34501', 'R225', '2025-03-07', '2025-03-21');
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B10201', 'R124', '2025-03-10', NULL);
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B51001', 'R301', '2025-03-12', '2025-03-28');
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B78902', 'R305', '2025-03-15', NULL);
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B22201', 'R123', '2025-03-18', NULL);
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B51002', 'R410', '2025-03-20', NULL);
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B51501', 'R411', '2025-03-22', '2025-04-01');
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B62001', 'R500', '2025-03-25', NULL);
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B78901', 'R124', '2025-03-28', NULL);
+INSERT INTO "LOAN" ("ITEMNO", "RID", "DOB", "DOR") VALUES ('B10101', 'R502', '2025-04-01', NULL);
+
 COMMIT;
+
+-- should report nothing:
+PRAGMA foreign_key_check;

@@ -5,17 +5,27 @@
 --     sqlite3 db/db2a-student_club_v1.db < schema/db2a-student_club_v1.sql
 -- Then check it with:
 --     python3 tools/check-db.py
+--
+-- Tables are written parents first, so the rows load with foreign keys
+-- enforced. "PRAGMA foreign_keys" is per connection and has no effect inside a
+-- transaction, which is why it is set before BEGIN: SQLite ignores it
+-- otherwise, and the setting is not stored in the database file.
+
+
+PRAGMA foreign_keys = ON;
 
 BEGIN TRANSACTION;
+
 CREATE TABLE Clubs (
 	CID CHAR(4) NOT NULL PRIMARY KEY, 
 	Name CHAR(30) UNIQUE, 
     Teacher CHAR(100)
 );
-INSERT INTO "Clubs" VALUES('ASTR','Astronomy Club','Mr. Wong');
-INSERT INTO "Clubs" VALUES('CHSS','Chess Club','Ms. Chan');
-INSERT INTO "Clubs" VALUES('MATH','Mathematics Club','Mr. Lee');
-INSERT INTO "Clubs" VALUES('COMP','Computer Club','Ms. Lau');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('ASTR', 'Astronomy Club', 'Mr. Wong');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('CHSS', 'Chess Club', 'Ms. Chan');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('MATH', 'Mathematics Club', 'Mr. Lee');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('COMP', 'Computer Club', 'Ms. Lau');
+
 CREATE TABLE Students (
 	SID CHAR(4) NOT NULL PRIMARY KEY, 
 	Cls CHAR(2), 
@@ -23,11 +33,17 @@ CREATE TABLE Students (
 	Ename CHAR(30) NOT NULL, 
     ClubID CHAR(4) REFERENCES Clubs(CID)
 );
-INSERT INTO "Students" VALUES('0011','1A',1,'Alice','CHSS');
-INSERT INTO "Students" VALUES('1021','1A',2,'Bob','ASTR');
-INSERT INTO "Students" VALUES('0223','1A',3,'Cathy','CHSS');
-INSERT INTO "Students" VALUES('0324','1A',4,'David','MATH');
-INSERT INTO "Students" VALUES('9324','1B',1,'Emily',NULL);
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename", "ClubID") VALUES ('0011', '1A', 1, 'Alice', 'CHSS');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename", "ClubID") VALUES ('1021', '1A', 2, 'Bob', 'ASTR');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename", "ClubID") VALUES ('0223', '1A', 3, 'Cathy', 'CHSS');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename", "ClubID") VALUES ('0324', '1A', 4, 'David', 'MATH');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename", "ClubID") VALUES ('9324', '1B', 1, 'Emily', NULL);
+
+-- indexes, views and triggers
 CREATE INDEX student_name_index
   ON Students (Ename);
+
 COMMIT;
+
+-- should report nothing:
+PRAGMA foreign_key_check;

@@ -5,28 +5,27 @@
 --     sqlite3 db/db2b-student_club_v2.db < schema/db2b-student_club_v2.sql
 -- Then check it with:
 --     python3 tools/check-db.py
+--
+-- Tables are written parents first, so the rows load with foreign keys
+-- enforced. "PRAGMA foreign_keys" is per connection and has no effect inside a
+-- transaction, which is why it is set before BEGIN: SQLite ignores it
+-- otherwise, and the setting is not stored in the database file.
+
+
+PRAGMA foreign_keys = ON;
 
 BEGIN TRANSACTION;
-CREATE TABLE ClubReg (
-	SID CHAR(4) NOT NULL REFERENCES Students(SID), 
-	CID CHAR(4) NOT NULL REFERENCES Clubs(CID),
-    PRIMARY KEY (SID, CID)
-);
-INSERT INTO "ClubReg" VALUES('1021','ASTR');
-INSERT INTO "ClubReg" VALUES('0011','CHSS');
-INSERT INTO "ClubReg" VALUES('0324','MATH');
-INSERT INTO "ClubReg" VALUES('0223','CHSS');
-INSERT INTO "ClubReg" VALUES('0223','ASTR');
-INSERT INTO "ClubReg" VALUES('0223','MATH');
+
 CREATE TABLE Clubs (
 	CID CHAR(4) NOT NULL PRIMARY KEY, 
 	Name CHAR(30) UNIQUE, 
     Teacher CHAR(100)
 );
-INSERT INTO "Clubs" VALUES('ASTR','Astronomy Club','Mr. Wong');
-INSERT INTO "Clubs" VALUES('CHSS','Chess Club','Ms. Chan');
-INSERT INTO "Clubs" VALUES('MATH','Mathematics Club','Mr. Lee');
-INSERT INTO "Clubs" VALUES('COMP','Computer Club','Ms. Lau');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('ASTR', 'Astronomy Club', 'Mr. Wong');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('CHSS', 'Chess Club', 'Ms. Chan');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('MATH', 'Mathematics Club', 'Mr. Lee');
+INSERT INTO "Clubs" ("CID", "Name", "Teacher") VALUES ('COMP', 'Computer Club', 'Ms. Lau');
+
 CREATE TABLE Students (
 	SID CHAR(4) NOT NULL PRIMARY KEY, 
 	Cls CHAR(2), 
@@ -34,8 +33,24 @@ CREATE TABLE Students (
 	Ename CHAR(30) NOT NULL,
     CONSTRAINT clsno_range CHECK (Clsno>=1 AND Clsno<=40)
 );
-INSERT INTO "Students" VALUES('0011','1A',1,'Alice');
-INSERT INTO "Students" VALUES('1021','1A',2,'Bob');
-INSERT INTO "Students" VALUES('0223','1A',3,'Cathy');
-INSERT INTO "Students" VALUES('0324','1A',4,'David');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename") VALUES ('0011', '1A', 1, 'Alice');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename") VALUES ('1021', '1A', 2, 'Bob');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename") VALUES ('0223', '1A', 3, 'Cathy');
+INSERT INTO "Students" ("SID", "Cls", "Clsno", "Ename") VALUES ('0324', '1A', 4, 'David');
+
+CREATE TABLE ClubReg (
+	SID CHAR(4) NOT NULL REFERENCES Students(SID), 
+	CID CHAR(4) NOT NULL REFERENCES Clubs(CID),
+    PRIMARY KEY (SID, CID)
+);
+INSERT INTO "ClubReg" ("SID", "CID") VALUES ('1021', 'ASTR');
+INSERT INTO "ClubReg" ("SID", "CID") VALUES ('0011', 'CHSS');
+INSERT INTO "ClubReg" ("SID", "CID") VALUES ('0324', 'MATH');
+INSERT INTO "ClubReg" ("SID", "CID") VALUES ('0223', 'CHSS');
+INSERT INTO "ClubReg" ("SID", "CID") VALUES ('0223', 'ASTR');
+INSERT INTO "ClubReg" ("SID", "CID") VALUES ('0223', 'MATH');
+
 COMMIT;
+
+-- should report nothing:
+PRAGMA foreign_key_check;

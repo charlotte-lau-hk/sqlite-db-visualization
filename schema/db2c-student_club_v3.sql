@@ -5,55 +5,69 @@
 --     sqlite3 db/db2c-student_club_v3.db < schema/db2c-student_club_v3.sql
 -- Then check it with:
 --     python3 tools/check-db.py
+--
+-- Tables are written parents first, so the rows load with foreign keys
+-- enforced. "PRAGMA foreign_keys" is per connection and has no effect inside a
+-- transaction, which is why it is set before BEGIN: SQLite ignores it
+-- otherwise, and the setting is not stored in the database file.
+
+
+PRAGMA foreign_keys = ON;
 
 BEGIN TRANSACTION;
+
 CREATE TABLE Club (
-  CID CHAR,
+  CID CHAR NOT NULL,
   Cname CHAR,
   PRIMARY KEY (CID)
 );
-INSERT INTO "Club" VALUES('ASTR','Astronomy Club');
-INSERT INTO "Club" VALUES('CHSS','Chess Club');
-INSERT INTO "Club" VALUES('MATH','Math Club');
-INSERT INTO "Club" VALUES('COMP','Computer Club');
+INSERT INTO "Club" ("CID", "Cname") VALUES ('ASTR', 'Astronomy Club');
+INSERT INTO "Club" ("CID", "Cname") VALUES ('CHSS', 'Chess Club');
+INSERT INTO "Club" ("CID", "Cname") VALUES ('MATH', 'Math Club');
+INSERT INTO "Club" ("CID", "Cname") VALUES ('COMP', 'Computer Club');
+
+CREATE TABLE Student (
+  SID CHAR NOT NULL,
+  Sname CHAR,
+  Phone CHAR,
+  PRIMARY KEY (SID)
+);
+INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('1021', 'Alice', '61231236');
+INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('0223', 'Kathy', '93030123');
+INSERT INTO "Student" ("SID", "Sname", "Phone") VALUES ('0324', 'Emily', '53698741');
+
 CREATE TABLE ClubInfo (
-  CID CHAR,
-  Syear INT,
+  CID CHAR NOT NULL,
+  Syear INT NOT NULL,
   Teacher CHAR,
   PRIMARY KEY (CID, Syear),
   FOREIGN KEY (CID) REFERENCES Club(CID)
 );
-INSERT INTO "ClubInfo" VALUES('ASTR',2023,'Wong');
-INSERT INTO "ClubInfo" VALUES('CHSS',2023,'Chan');
-INSERT INTO "ClubInfo" VALUES('MATH',2023,'Lee');
-INSERT INTO "ClubInfo" VALUES('COMP',2024,'Lau');
-INSERT INTO "ClubInfo" VALUES('ASTR',2024,'Wong');
-INSERT INTO "ClubInfo" VALUES('MATH',2024,'Kim');
+INSERT INTO "ClubInfo" ("CID", "Syear", "Teacher") VALUES ('ASTR', 2023, 'Wong');
+INSERT INTO "ClubInfo" ("CID", "Syear", "Teacher") VALUES ('CHSS', 2023, 'Chan');
+INSERT INTO "ClubInfo" ("CID", "Syear", "Teacher") VALUES ('MATH', 2023, 'Lee');
+INSERT INTO "ClubInfo" ("CID", "Syear", "Teacher") VALUES ('COMP', 2024, 'Lau');
+INSERT INTO "ClubInfo" ("CID", "Syear", "Teacher") VALUES ('ASTR', 2024, 'Wong');
+INSERT INTO "ClubInfo" ("CID", "Syear", "Teacher") VALUES ('MATH', 2024, 'Kim');
+
 CREATE TABLE ClubReg (
-  CID CHAR,
-  Syear INT,
-  SID CHAR,
+  CID CHAR NOT NULL,
+  Syear INT NOT NULL,
+  SID CHAR NOT NULL,
   PRIMARY KEY (CID, Syear, SID),
   FOREIGN KEY (SID) REFERENCES Student(SID),
   FOREIGN KEY (CID, Syear)
     REFERENCES ClubInfo(CID, Syear)
 );
-INSERT INTO "ClubReg" VALUES('ASTR',2023,'1021');
-INSERT INTO "ClubReg" VALUES('CHSS',2023,'1021');
-INSERT INTO "ClubReg" VALUES('MATH',2023,'0223');
-INSERT INTO "ClubReg" VALUES('COMP',2024,'0324');
-INSERT INTO "ClubReg" VALUES('MATH',2024,'0223');
-INSERT INTO "ClubReg" VALUES('MATH',2024,'1021');
-INSERT INTO "ClubReg" VALUES('ASTR',2024,'0324');
-CREATE TABLE Student (
-  SID CHAR,
-  Sname CHAR,
-  Phone CHAR,
-  PRIMARY KEY (SID)
-);
-INSERT INTO "Student" VALUES('1021','Alice','61231236');
-INSERT INTO "Student" VALUES('0223','Kathy','93030123');
-INSERT INTO "Student" VALUES('0324','Emily','53698741');
+INSERT INTO "ClubReg" ("CID", "Syear", "SID") VALUES ('ASTR', 2023, '1021');
+INSERT INTO "ClubReg" ("CID", "Syear", "SID") VALUES ('CHSS', 2023, '1021');
+INSERT INTO "ClubReg" ("CID", "Syear", "SID") VALUES ('MATH', 2023, '0223');
+INSERT INTO "ClubReg" ("CID", "Syear", "SID") VALUES ('COMP', 2024, '0324');
+INSERT INTO "ClubReg" ("CID", "Syear", "SID") VALUES ('MATH', 2024, '0223');
+INSERT INTO "ClubReg" ("CID", "Syear", "SID") VALUES ('MATH', 2024, '1021');
+INSERT INTO "ClubReg" ("CID", "Syear", "SID") VALUES ('ASTR', 2024, '0324');
+
+-- indexes, views and triggers
 CREATE VIEW ClubRecord AS
   SELECT ClubReg.CID,
          Club.Cname,
@@ -70,4 +84,8 @@ CREATE VIEW ClubRecord AS
     AND ClubInfo.Syear = ClubReg.Syear
   INNER JOIN Club
      ON Club.CID = ClubInfo.CID;
+
 COMMIT;
+
+-- should report nothing:
+PRAGMA foreign_key_check;

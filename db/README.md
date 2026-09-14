@@ -99,7 +99,28 @@ python3 tools/check-db.py
 That text is what makes a change reviewable: a diff of the `.sql` shows which
 constraint moved, where a diff of the `.db` shows only that some bytes changed.
 Edit the SQL, rebuild, check - or edit the database and re-run
-`tools/dump-schema.py` to bring the SQL back in step.
+`tools/dump-schema.py` to bring the SQL back in step. `tools/check-db.py`
+rebuilds each database from its `.sql` and compares, so the two cannot drift
+apart unnoticed.
+
+### Two conventions these files follow
+
+**`PRAGMA foreign_keys = ON;` at the top, before `BEGIN TRANSACTION`.** SQLite
+does not enforce foreign keys unless a connection asks for it, and the pragma
+is *ignored inside a transaction* - so the line has to come first, and the
+tables are written parents before children so the rows load under enforcement.
+The setting lives in the connection, never in the `.db` file: whatever opens
+the database afterwards decides for itself, which is why the file is loaded
+with foreign keys on again in `tools/check-db.py`.
+
+**`NOT NULL` on every primary-key column.** SQLite keeps a long-standing quirk:
+a `PRIMARY KEY` column still accepts `NULL` unless it is declared `NOT NULL`,
+which would quietly contradict the entity integrity the exercise is teaching.
+The one exception is a lone `INTEGER PRIMARY KEY` - that column *is* the rowid,
+a `NULL` inserted there is replaced by the next number, and declaring it
+`NOT NULL` would only break that. `Category.Category_ID` in the stationery shop
+database is the single case; `tools/check-db.py` knows to skip it and warns
+about every other nullable key column.
 
 Write the `CREATE TABLE` statements by hand, with table-level `FOREIGN KEY`
 clauses. A composite foreign key must be **one** clause naming every column:
