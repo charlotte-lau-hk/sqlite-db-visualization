@@ -328,7 +328,7 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
                     <div class="text-[11px] hdr-muted flex items-center gap-2 flex-wrap">
-                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.14-5</span>
+                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.15-1</span>
                         <span class="opacity-30">|</span>
                         <div class="flex items-center gap-1.5">
                             <span>Created by</span>
@@ -374,10 +374,11 @@
                         </select>
                     </div>
 
-                    <button id="sqlonline-btn" onclick="openInSqlOnline()" title="Open this database in the SQLite Online editor and practise SQL"
+                    <a id="sqlonline-btn" href="https://sqliteonline.com/" target="_blank" rel="noopener" onclick="openInSqlOnline(event)"
+                        title="Open this database in the SQLite Online editor and practise SQL"
                         class="hidden btn-accent px-5 py-2 rounded-lg shadow-md transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
                         <i class="fas fa-terminal text-xs"></i> Practice SQL
-                    </button>
+                    </a>
 
                     <label class="cursor-pointer btn-quiet px-4 py-2 rounded-lg shadow-sm transition-all text-sm font-bold flex items-center gap-2 uppercase tracking-wide border">
                         <i class="fas fa-file-upload text-xs"></i> Load File
@@ -610,6 +611,7 @@
             document.body.dataset.theme = currentTheme;
             if (window.mermaid) window.mermaid.initialize(window.buildMermaidConfig());
             if (rerender && lastGeneratedMermaidCode) renderDiagram(lastGeneratedMermaidCode);
+            refreshSqlOnlineLink();                                      // the link carries the skin
         }
 
         /* ==================== SAMPLE DATABASE INDEX ====================
@@ -716,18 +718,26 @@
             return lines.join('\r\n');
         }
 
-        function openInSqlOnline() {
-            if (!currentDbData) return;
+        function sqlOnlineLink() {
             const url = publicSampleUrl();
             const skin = skinUrl();
-            if (url) {
-                const tab = (currentDbLabel.replace(/[^A-Za-z0-9 _-]/g, '').trim() || 'Practice').slice(0, 40);
-                const payload = ['#url-sqlite=' + url, '#tab-name=' + tab, starterSql()].join('\r\n');
-                let link = SQL_ONLINE_URL + '#sqltext=' + encodeURIComponent(payload);
-                if (skin) link += '#urlcolor=' + skin;                   // raw on purpose, see above
-                window.open(link, '_blank', 'noopener');
-            } else {
-                window.open(skin ? SQL_ONLINE_URL + '#urlcolor=' + skin : SQL_ONLINE_URL, '_blank', 'noopener');
+            if (!url) return skin ? SQL_ONLINE_URL + '#urlcolor=' + skin : SQL_ONLINE_URL;
+            const tab = (currentDbLabel.replace(/[^A-Za-z0-9 _-]/g, '').trim() || 'Practice').slice(0, 40);
+            const payload = ['#url-sqlite=' + url, '#tab-name=' + tab, starterSql()].join('\r\n');
+            let link = SQL_ONLINE_URL + '#sqltext=' + encodeURIComponent(payload);
+            if (skin) link += '#urlcolor=' + skin;                       // raw on purpose, see above
+            return link;
+        }
+
+        // The button is a real link, so it can be copied or opened in a new tab;
+        // its href is rebuilt whenever the database or the theme changes.
+        function refreshSqlOnlineLink() {
+            document.getElementById('sqlonline-btn').href = sqlOnlineLink();
+        }
+
+        function openInSqlOnline(event) {                                // the href does the opening
+            if (!currentDbData) { event.preventDefault(); return; }
+            if (!publicSampleUrl()) {
                 showHint('<b>SQL Online opened in a new tab.</b><br>This database cannot be sent through a link, because ' +
                          'SQL Online has no address to download it from. In SQL Online, click <b>Import</b> and choose <b>' +
                          escapeHtml(currentSampleFile || currentDbLabel) + '</b> from your computer.');
@@ -916,6 +926,7 @@
                     document.getElementById('export-controls').classList.remove('hidden');
                 }
                 document.getElementById('copy-schema-btn').classList.remove('hidden');
+                refreshSqlOnlineLink();
                 document.getElementById('sqlonline-btn').classList.remove('hidden');
                 document.getElementById('copy-sql-btn').classList.remove('hidden');
                 const fullSql = document.getElementById('full-sql-link');
