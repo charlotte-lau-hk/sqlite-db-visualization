@@ -328,7 +328,7 @@
                 <div class="flex flex-col gap-2">
                     <h1 class="text-3xl font-extrabold tracking-tight text-white leading-tight">SQLite DB Visualization</h1>
                     <div class="text-[11px] hdr-muted flex items-center gap-2 flex-wrap">
-                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.15-1</span>
+                        <span class="font-mono ver-chip px-2 py-0.5 rounded border">v2026.09.15-2</span>
                         <span class="opacity-30">|</span>
                         <div class="flex items-center gap-1.5">
                             <span>Created by</span>
@@ -593,6 +593,9 @@
                     secondaryColor: t.secondary,
                     tertiaryColor: t.tertiary
                 },
+                // Field names are bold. Set here rather than after drawing, so
+                // mermaid measures the bold text when it sizes the columns.
+                themeCSS: 'text[id*="-attr-"][id$="-name"] { font-weight: 700; }',
                 er: {
                     useMaxWidth: false,
                     direction: 'TB',
@@ -949,6 +952,7 @@
             try {
                 window.mermaid.initialize(window.buildMermaidConfig());
                 await window.mermaid.run();
+                nameColumnFirst(diagramContainer);
                 const svg = diagramContainer.querySelector('svg');
                 if (svg) { svg.style.width = '100%'; svg.style.height = 'auto'; svg.style.maxWidth = 'none'; }
             } catch (err) {
@@ -959,6 +963,30 @@
                     <p class="text-xs text-red-500 font-mono max-w-lg text-center">${err.message ?? String(err)}</p>
                 </div>`;
             }
+        }
+
+        /* Mermaid's ER syntax is "type name", and it draws the columns in that
+           order. The attribute rows read better as name, type, constraints, so
+           the first two columns swap places in the drawn SVG. Mermaid puts each
+           cell's rect just before its text; the constraint column starts where
+           the two end, so it stays put. */
+        function nameColumnFirst(container) {
+            const shiftX = (el, dx) => el.setAttribute('transform',
+                el.getAttribute('transform').replace(/translate\(\s*([-\d.e]+)/,
+                    (_, x) => 'translate(' + (parseFloat(x) + dx)));
+            container.querySelectorAll('text[id$="-type"]').forEach(typeText => {
+                const nameText = document.getElementById(typeText.id.replace(/-type$/, '-name'));
+                if (!nameText) return;
+                const typeRect = typeText.previousElementSibling;
+                const nameRect = nameText.previousElementSibling;
+                const typeW = parseFloat(typeRect.getAttribute('width'));
+                const nameW = parseFloat(nameRect.getAttribute('width'));
+                const left = parseFloat(typeRect.getAttribute('x'));
+                nameRect.setAttribute('x', left);
+                typeRect.setAttribute('x', left + nameW);
+                shiftX(nameText, -typeW);
+                shiftX(typeText, nameW);
+            });
         }
 
         function switchTab(tab) {
