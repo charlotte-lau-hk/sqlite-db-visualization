@@ -34,5 +34,11 @@
     "filename": "dbviz-06-lunch-delivery.db",
     "theme": "sakura",
     "description": "Members order lunch: one main dish, a drink if they want one, stamped with the time. Some orders have no drink, and not every member has ordered."
+  },
+  {
+    "name": "Book Loan DB v2 (4 tables)",
+    "filename": "sample-db-library-book-loan.db",
+    "theme": "green",
+    "description": "A sample DB for a library, where a book may have several copies. User may be of role 'Student', 'Librarian' or 'Admin'."
   }
 ]
