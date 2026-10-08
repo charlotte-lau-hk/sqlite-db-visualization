@@ -40,5 +40,13 @@
     "filename": "sample-db-library-book-loan.db",
     "theme": "green",
     "description": "A sample DB for a library, where a book may have several copies. User may be of role 'Student', 'Librarian' or 'Admin'."
+  },
+  {
+    "name": "Teacher Room Entry DB (3 tables)",
+    "filename": " sample-db-teacher-room-entry.db",
+    "theme": "green",
+    "description": "A sample DB for storing entry record teachers entering rooms"
   }
+
+ 
 ]
